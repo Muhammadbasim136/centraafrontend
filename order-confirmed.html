@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed | Centraa</title>
+<meta name="description" content="Your order at Centraa has been confirmed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-surface: #111111;
+    --bg-card: #181818;
+    --gold: #c9a84c;
+    --gold-light: #e0b96a;
+    --gold-dim: #c9a84c33;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-muted: #666666;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --border: #2a2a2a;
+    --radius: 10px;
+    --transition: all 0.25s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, .font-display { font-family: 'Playfair Display', serif; }
+
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  ul { list-style: none; }
+  img { max-width: 100%; display: block; }
+
+  ::selection { background: var(--gold-dim); color: var(--gold-light); }
+
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  ::-webkit-scrollbar { height: 6px; width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-surface); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+  /* Nothing renders until the security check clears this. */
+  #appRoot { display: none; }
+
+  /* ============ NAVBAR ============ */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo { display: flex; flex-direction: column; line-height: 1; }
+
+  .logo-mark {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 3px;
+    color: var(--text-primary);
+  }
+
+  .logo-mark span { color: var(--gold); }
+
+  .logo-tagline { font-size: 9px; letter-spacing: 4px; color: var(--text-muted); margin-top: 3px; }
+
+  .nav-links { display: flex; align-items: center; gap: 40px; }
+
+  .nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+    position: relative;
+    padding: 4px 0;
+    transition: var(--transition);
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: var(--transition);
+  }
+
+  .nav-link:hover { color: var(--text-primary); }
+  .nav-link:hover::after { width: 100%; }
+
+  .nav-actions { display: flex; align-items: center; gap: 22px; }
+
+  .icon-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+
+  .icon-btn:hover { color: var(--gold-light); background: var(--bg-card); }
+  .icon-btn svg { width: 21px; height: 21px; }
+
+  .cart-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--bg-primary);
+    font-size: 10px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .book-table-btn {
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 9px 20px;
+    border-radius: 4px;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+
+  .book-table-btn:hover { background: var(--gold); color: var(--bg-primary); }
+
+  .mobile-toggle {
+    display: none;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+  }
+
+  .mobile-toggle svg { width: 24px; height: 24px; }
+
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .mobile-menu.open { max-height: 400px; }
+
+  .mobile-menu a {
+    padding: 16px 32px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-menu a:hover { color: var(--gold-light); }
+
+  /* ============ MAIN ============ */
+  main { max-width: 1240px; margin: 0 auto; padding: 0 32px 80px; }
+
+  /* ============ SUCCESS HERO ============ */
+  .hero { text-align: center; padding: 72px 20px 56px; }
+
+  .success-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(46, 204, 113, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .checkmark { width: 52px; height: 52px; }
+
+  .checkmark-circle {
+    stroke: var(--success);
+    stroke-width: 2;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: strokeDraw 0.6s ease 0.3s forwards;
+  }
+
+  .checkmark-check {
+    stroke: var(--success);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: strokeDraw 0.4s ease 0.8s forwards;
+  }
+
+  @keyframes strokeDraw { to { stroke-dashoffset: 0; } }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-title {
+    font-size: 38px;
+    font-style: italic;
+    font-weight: 600;
+    color: var(--text-primary);
+    opacity: 0;
+    animation: fadeIn 0.5s ease 0.6s both;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 0.8s both;
+  }
+
+  .order-id-pill {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 24px;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 9px 20px;
+    border-radius: 30px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 1s both;
+    transition: var(--transition);
+  }
+
+  .order-id-pill:hover { background: var(--gold-dim); }
+
+  .copy-tooltip {
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--gold);
+    color: var(--bg-primary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0;
+    padding: 5px 11px;
+    border-radius: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+
+  .copy-tooltip.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ============ DETAILS GRID ============ */
+  .details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .info-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+
+  /* Order items */
+  .order-item-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+
+  .order-item-img {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--bg-surface);
+  }
+
+  .order-item-img.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+  }
+
+  .order-item-info { flex: 1; min-width: 0; }
+
+  .order-item-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .order-item-qty { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+
+  .order-item-price { font-size: 14px; font-weight: 700; color: var(--gold-light); white-space: nowrap; }
+
+  .summary-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  .summary-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+  .summary-row .label { color: var(--text-secondary); }
+  .summary-row .value { font-weight: 600; }
+  .summary-row.discount-row .value { color: var(--success); }
+
+  .total-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .total-row .label { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .total-row .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Delivery info rows */
+  .delivery-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+  .delivery-row:last-child { margin-bottom: 0; }
+
+  .delivery-icon { font-size: 17px; line-height: 1.4; flex-shrink: 0; width: 22px; text-align: center; }
+
+  .delivery-value { font-size: 14px; color: var(--text-primary); line-height: 1.5; }
+  .delivery-value.muted { color: var(--text-secondary); }
+
+  /* ============ TIMELINE ============ */
+  .timeline-section { margin-top: 24px; }
+
+  .timeline-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px 26px;
+  }
+
+  .timeline-wrap { overflow-x: auto; padding-bottom: 4px; }
+
+  .timeline-dots-row {
+    display: flex;
+    align-items: center;
+    min-width: 520px;
+  }
+
+  .step-dot {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    transition: var(--transition);
+  }
+
+  .step-dot.completed { background: var(--success); border-color: var(--success); }
+
+  .step-dot.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px var(--gold-dim);
+    animation: pulse 1.5s ease infinite;
+  }
+
+  .step-dot.pending { background: transparent; border-color: var(--border); }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px var(--gold-dim); }
+    50% { box-shadow: 0 0 0 8px transparent; }
+  }
+
+  .step-line { flex: 1; height: 2px; background: var(--border); transition: var(--transition); }
+  .step-line.completed { background: var(--success); }
+
+  .timeline-labels-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    min-width: 520px;
+  }
+
+  .step-label {
+    flex: 1;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .step-label:first-child { text-align: left; }
+  .step-label:last-child { text-align: right; }
+
+  .step-label.completed { color: var(--success); }
+  .step-label.active { color: var(--gold-light); font-weight: 700; }
+
+  .estimated-delivery {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 26px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .clock-icon { width: 16px; height: 16px; color: var(--gold); }
+
+  .estimated-delivery strong { color: var(--text-primary); font-weight: 600; }
+
+  .cancelled-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    border-radius: 8px;
+    padding: 16px;
+    color: #f0a8a0;
+    font-weight: 600;
+    font-size: 14.5px;
+  }
+
+  /* ============ ACTIONS ============ */
+  .actions-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 44px;
+    flex-wrap: wrap;
+  }
+
+  .btn-gold {
+    background: var(--gold);
+    color: var(--bg-primary);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 14px 28px;
+    border-radius: 6px;
+    transition: var(--transition);
+  }
+
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-outline {
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 14px 28px;
+    border-radius: 6px;
+    transition: var(--transition);
+  }
+
+  .btn-outline:hover { background: var(--gold); color: var(--bg-primary); }
+
+  .btn-text {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 14px 12px;
+    transition: var(--transition);
+  }
+
+  .btn-text:hover { color: var(--text-primary); }
+
+  /* ============ TOAST ============ */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1100; display: flex; flex-direction: column; gap: 10px; }
+
+  .toast {
+    background: var(--bg-card);
+    border: 1px solid var(--gold);
+    color: var(--text-primary);
+    padding: 13px 20px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    max-width: 280px;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ============ CONFETTI ============ */
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ============ FOOTER ============ */
+  .footer { background: var(--bg-surface); border-top: 1px solid var(--border); margin-top: 60px; }
+
+  .footer-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 56px 32px 28px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    gap: 40px;
+  }
+
+  .footer-logo-mark {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+  }
+
+  .footer-logo-mark span { color: var(--gold); }
+
+  .footer-about { font-size: 13.5px; color: var(--text-muted); line-height: 1.7; max-width: 280px; }
+
+  .footer-social { display: flex; gap: 12px; margin-top: 20px; }
+
+  .footer-social a {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+
+  .footer-social a:hover { border-color: var(--gold); color: var(--gold-light); }
+  .footer-social svg { width: 16px; height: 16px; }
+
+  .footer-heading {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--gold-light);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+
+  .footer-links li { margin-bottom: 12px; }
+  .footer-links a { font-size: 13.5px; color: var(--text-muted); transition: var(--transition); }
+  .footer-links a:hover { color: var(--gold-light); }
+
+  .footer-contact li {
+    display: flex;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .footer-contact svg { width: 16px; height: 16px; min-width: 16px; color: var(--gold); margin-top: 1px; }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 20px 32px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    .details-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .nav-inner, main { padding-left: 20px; padding-right: 20px; }
+    .nav-links, .book-table-btn { display: none; }
+    .mobile-toggle { display: flex; }
+    .mobile-menu { display: flex; }
+    .hero { padding: 52px 16px 40px; }
+    .hero-title { font-size: 28px; }
+    .actions-section { flex-direction: column; width: 100%; }
+    .actions-section a, .actions-section button { width: 100%; text-align: center; }
+    .footer-inner { grid-template-columns: 1fr; gap: 32px; padding: 40px 20px 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="appRoot">
+
+  <!-- ============ NAVBAR ============ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">CENTR<span>A</span>A</span>
+        <span class="logo-tagline">FINE DINING</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="menu.html" class="nav-link">Menu</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="reservations.html" class="nav-link">Reservations</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="account.html" class="icon-btn" aria-label="Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        </a>
+        <a href="cart.html" class="icon-btn" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/><path d="M2.5 3h2.6l2.4 12.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg>
+          <span class="cart-badge">0</span>
+        </a>
+        <a href="reservations.html" class="book-table-btn">Book a Table</a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="about.html">About</a>
+      <a href="reservations.html">Reservations</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ============ SUCCESS HERO ============ -->
+    <section class="hero">
+      <div class="success-circle">
+        <svg class="checkmark" viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14 27l8 8 16-16"/>
+        </svg>
+      </div>
+
+      <h1 class="hero-title">Order Confirmed!</h1>
+
+      <p class="hero-subtitle" id="thankYouText">Thank you! Your order has been placed successfully.</p>
+      <p class="hero-subtitle" id="emailNoticeText">A confirmation email has been sent to your email.</p>
+
+      <button class="order-id-pill" id="orderIdPill">
+        <span id="orderIdText">Order #—</span>
+        <span class="copy-tooltip" id="copyTooltip">Copied!</span>
+      </button>
+    </section>
+
+    <!-- ============ ORDER DETAILS + DELIVERY INFO ============ -->
+    <section class="details-grid">
+      <div class="info-card">
+        <h2>Order Details</h2>
+        <div id="orderItemsList"><!-- populated by JS --></div>
+        <div class="summary-divider"></div>
+        <div class="summary-row">
+          <span class="label">Subtotal</span>
+          <span class="value" id="subtotalValue">Rs. 0</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Delivery Fee</span>
+          <span class="value" id="deliveryValue">Rs. 0</span>
+        </div>
+        <div class="summary-row discount-row" id="discountRow" style="display:none;">
+          <span class="label">Discount</span>
+          <span class="value" id="discountValue">− Rs. 0</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="total-row">
+          <span class="label">Total</span>
+          <span class="value" id="totalValue">Rs. 0</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h2>Delivery Information</h2>
+        <div class="delivery-row">
+          <span class="delivery-icon">📍</span>
+          <span class="delivery-value" id="deliveryAddressText">—</span>
+        </div>
+        <div class="delivery-row">
+          <span class="delivery-icon">📞</span>
+          <span class="delivery-value" id="deliveryPhoneText">—</span>
+        </div>
+        <div class="delivery-row">
+          <span class="delivery-icon">💳</span>
+          <span class="delivery-value" id="deliveryPaymentText">—</span>
+        </div>
+        <div class="delivery-row" id="deliveryNoteRow" style="display:none;">
+          <span class="delivery-icon">📝</span>
+          <span class="delivery-value muted" id="deliveryNoteText"></span>
+        </div>
+        <div class="delivery-row">
+          <span class="delivery-icon">🕐</span>
+          <span class="delivery-value muted" id="deliveryPlacedText">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ORDER STATUS TIMELINE ============ -->
+    <section class="timeline-section">
+      <div class="timeline-card">
+        <div id="timelineActive">
+          <div class="timeline-wrap">
+            <div class="timeline-dots-row" id="timelineDotsRow"></div>
+            <div class="timeline-labels-row" id="timelineLabelsRow"></div>
+          </div>
+          <p class="estimated-delivery" id="estimatedDelivery">
+            <svg class="clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            Estimated Delivery: <strong>45 – 60 minutes</strong>
+          </p>
+        </div>
+        <div class="cancelled-badge" id="cancelledBadge" style="display:none;">
+          ✕ Order Cancelled
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ACTION BUTTONS ============ -->
+    <section class="actions-section">
+      <a href="orders.html" class="btn-gold" id="trackOrderBtn">Track My Order</a>
+      <button class="btn-outline" id="orderAgainBtn">Order Again</button>
+      <a href="menu.html" class="btn-text">Back to Menu</a>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo-mark">CENTR<span>A</span>A</div>
+        <p class="footer-about">A refined dining experience rooted in Pakistani heritage — crafted ingredients, slow technique, and a table set for the people who matter most to you.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 3h-3a4 4 0 0 0-4 4v3H6v4h3v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21l1.6-4.8A8 8 0 1 1 8.8 19.4z"/></svg></a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Explore</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="reservations.html">Reservations</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Help</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="faq.html">FAQs</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Visit</h4>
+        <ul class="footer-contact">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Khayaban-e-Shahbaz, DHA Phase 6, Karachi</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 2.9a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c.9.4 1.9.6 2.9.7a2 2 0 0 1 1.8 2.1z"/></svg>
+            <span>+92 21 111 222 333</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+            <span>reservations@centraa.pk</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Centraa. All rights reserved.</div>
+  </footer>
+
+</div>
+
+<!-- ============ TOAST CONTAINER ============ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  /* ============ CONFIG & HELPERS ============ */
+  const API_BASE = 'https://centraa-backend.vercel.app';
+  const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
+  const authHeaders = () => {
+    const u = getUser();
+    return u ? { 'Authorization': `Bearer ${u.uid}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+  };
+  const updateCartBadge = () => {
+    const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  };
+
+  const formatRs = (n) => 'Rs. ' + Math.round(n).toLocaleString('en-US');
+
+  function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  function formatOrderDate(dateStr) {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '—';
+    const day = d.getDate();
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    const year = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
+  }
+
+  const PAYMENT_LABELS = {
+    cod: 'Cash on Delivery',
+    jazzcash: 'JazzCash / Easypaisa',
+    card: 'Card Payment'
+  };
+
+  /* ============ TOAST ============ */
+  const toastContainer = document.getElementById('toastContainer');
+  function showToast(message) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = message;
+    toastContainer.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 300);
+    }, 2600);
+  }
+
+  /* ============ MOBILE NAV ============ */
+  const mobileToggle = document.getElementById('mobileToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  mobileToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+
+  /* ============ ORDER STATUS TIMELINE ============ */
+  const STATUSES = [
+    { key: 'pending',          label: 'Order Placed', icon: '📋' },
+    { key: 'confirmed',        label: 'Confirmed',    icon: '✅' },
+    { key: 'preparing',        label: 'Preparing',    icon: '👨‍🍳' },
+    { key: 'out_for_delivery', label: 'On the Way',   icon: '🛵' },
+    { key: 'delivered',        label: 'Delivered',    icon: '🎉' }
+  ];
+
+  function renderTimeline(status) {
+    const timelineActive = document.getElementById('timelineActive');
+    const cancelledBadge = document.getElementById('cancelledBadge');
+    const estimatedDelivery = document.getElementById('estimatedDelivery');
+
+    if (status === 'cancelled') {
+      timelineActive.style.display = 'none';
+      cancelledBadge.style.display = 'flex';
+      return;
+    }
+
+    let currentIndex = STATUSES.findIndex(s => s.key === status);
+    if (currentIndex === -1) currentIndex = 0;
+
+    const dotsRow = document.getElementById('timelineDotsRow');
+    const labelsRow = document.getElementById('timelineLabelsRow');
+
+    let dotsHTML = '';
+    let labelsHTML = '';
+
+    STATUSES.forEach((s, i) => {
+      let stateClass = 'pending';
+      if (i < currentIndex) stateClass = 'completed';
+      else if (i === currentIndex) stateClass = 'active';
+
+      dotsHTML += `<div class="step-dot ${stateClass}"></div>`;
+      if (i < STATUSES.length - 1) {
+        dotsHTML += `<div class="step-line ${i < currentIndex ? 'completed' : ''}"></div>`;
+      }
+      labelsHTML += `<span class="step-label ${stateClass}">${s.icon} ${s.label}</span>`;
+    });
+
+    dotsRow.innerHTML = dotsHTML;
+    labelsRow.innerHTML = labelsHTML;
+
+    if (status === 'delivered') {
+      estimatedDelivery.style.display = 'none';
+    } else {
+      estimatedDelivery.style.display = 'flex';
+    }
+  }
+
+  /* ============ RENDER ORDER DETAILS ============ */
+  function orderItemRowHTML(item) {
+    const imgTag = item.image
+      ? `<img src="${item.image}" alt="${escapeHTML(item.name)}" class="order-item-img" onerror="this.outerHTML=orderItemPlaceholderHTML();">`
+      : orderItemPlaceholderHTML();
+    return `
+      <div class="order-item-row">
+        ${imgTag}
+        <div class="order-item-info">
+          <div class="order-item-name">${escapeHTML(item.name)}</div>
+          <div class="order-item-qty">x${item.qty}</div>
+        </div>
+        <div class="order-item-price">${formatRs(item.price * item.qty)}</div>
+      </div>
+    `;
+  }
+
+  function orderItemPlaceholderHTML() {
+    return `<div class="order-item-img placeholder"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m21 15-5-5L5 21"/></svg></div>`;
+  }
+
+  function renderOrderDetails(order) {
+    const items = order.items || [];
+    document.getElementById('orderItemsList').innerHTML = items.map(orderItemRowHTML).join('');
+
+    const subtotal = typeof order.subtotal === 'number'
+      ? order.subtotal
+      : items.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const deliveryFee = typeof order.deliveryFee === 'number' ? order.deliveryFee : 0;
+    const discount = typeof order.discount === 'number' ? order.discount : 0;
+    const total = typeof order.total === 'number'
+      ? order.total
+      : Math.max(0, subtotal + deliveryFee - discount);
+
+    document.getElementById('subtotalValue').textContent = formatRs(subtotal);
+    document.getElementById('deliveryValue').textContent = deliveryFee === 0 ? 'Free ✓' : formatRs(deliveryFee);
+
+    const discountRow = document.getElementById('discountRow');
+    if (discount > 0) {
+      discountRow.style.display = 'flex';
+      document.getElementById('discountValue').textContent = `− ${formatRs(discount)}`;
+    }
+
+    document.getElementById('totalValue').textContent = formatRs(total);
+  }
+
+  function renderDeliveryInfo(order) {
+    const addr = order.deliveryAddress || {};
+    const addressParts = [addr.street, addr.area, addr.city].filter(Boolean);
+    document.getElementById('deliveryAddressText').textContent = addressParts.length ? addressParts.join(', ') : '—';
+
+    document.getElementById('deliveryPhoneText').textContent = order.phone || '—';
+
+    const paymentKey = order.paymentMethod || 'cod';
+    document.getElementById('deliveryPaymentText').textContent = PAYMENT_LABELS[paymentKey] || paymentKey;
+
+    if (order.note && order.note.trim()) {
+      document.getElementById('deliveryNoteRow').style.display = 'flex';
+      document.getElementById('deliveryNoteText').textContent = order.note.trim();
+    }
+
+    document.getElementById('deliveryPlacedText').textContent = `Placed: ${formatOrderDate(order.createdAt)}`;
+  }
+
+  /* ============ COPY ORDER ID ============ */
+  function setupCopyOrderId(orderId) {
+    const pill = document.getElementById('orderIdPill');
+    const tooltip = document.getElementById('copyTooltip');
+    document.getElementById('orderIdText').textContent = `Order #${orderId}`;
+
+    pill.addEventListener('click', () => {
+      const showCopied = () => {
+        tooltip.classList.add('show');
+        setTimeout(() => tooltip.classList.remove('show'), 2000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(orderId).then(showCopied).catch(showCopied);
+      } else {
+        showCopied();
+      }
+    });
+  }
+
+  /* ============ ACTION BUTTONS ============ */
+  function setupActionButtons(order, orderId) {
+    document.getElementById('trackOrderBtn').href = `orders.html?highlight=${orderId}`;
+    document.getElementById('orderAgainBtn').addEventListener('click', () => orderAgain(order));
+  }
+
+  function orderAgain(order) {
+    const items = order.items || [];
+    const availableItems = items.filter(item => item.available !== false);
+
+    if (availableItems.length === 0) {
+      showToast('Sorry, none of these items are available anymore.');
+      return;
+    }
+
+    const cart = availableItems.map(item => ({
+      id: item.productId,
+      name: item.name,
+      price: item.price, // display only — backend re-verifies on next order
+      image: item.image || '',
+      qty: item.qty
+    }));
+
+    localStorage.setItem('centraa_cart', JSON.stringify(cart));
+
+    if (availableItems.length < items.length) {
+      showToast('Some items are no longer available and were skipped.');
+      setTimeout(() => { window.location.href = 'cart.html'; }, 1300);
+    } else {
+      window.location.href = 'cart.html';
+    }
+  }
+
+  /* ============ CONFETTI ============ */
+  function launchConfetti() {
+    const colors = ['#c9a84c', '#e0b96a', '#ffffff', '#2ecc71'];
+    const count = 80;
+
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.style.cssText = `
+        position: fixed;
+        width: ${Math.random() * 8 + 4}px;
+        height: ${Math.random() * 8 + 4}px;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        left: ${Math.random() * 100}vw;
+        top: -10px;
+        border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+        opacity: ${Math.random() * 0.7 + 0.3};
+        animation: fall ${Math.random() * 2 + 1.5}s ease-in ${Math.random() * 1.5}s forwards;
+        pointer-events: none;
+        z-index: 9999;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+  }
+
+  /* ============ RENDER CONFIRMATION ============ */
+  function renderConfirmation(order, orderId) {
+    const user = getUser();
+
+    document.getElementById('thankYouText').textContent =
+      `Thank you, ${user && user.name ? user.name : 'there'}! Your order has been placed successfully.`;
+    document.getElementById('emailNoticeText').textContent =
+      `A confirmation email has been sent to ${user && user.email ? user.email : 'your email'}`;
+
+    setupCopyOrderId(orderId);
+    renderOrderDetails(order);
+    renderDeliveryInfo(order);
+    renderTimeline(order.status || 'pending');
+    setupActionButtons(order, orderId);
+
+    updateCartBadge();
+
+    // Reveal the page now that everything is verified and populated.
+    document.getElementById('appRoot').style.display = 'block';
+
+    launchConfetti();
+  }
+
+  /* ============ SECURITY CHECK (runs immediately) ============ */
+  (async function securityCheck() {
+    // Step 1: Must be logged in
+    const user = getUser();
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    // Step 2: Must have orderId in URL
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+    if (!orderId) { window.location.href = 'index.html'; return; }
+
+    // Step 3: Verify order belongs to this user via backend
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/${orderId}`, {
+        headers: authHeaders()
+      });
+
+      // 401 = not logged in, 403 = someone else's order, 404 = fake orderId
+      if (!res.ok) { window.location.href = 'index.html'; return; }
+
+      const order = await res.json();
+
+      // Extra check: userId must match current user
+      if (order.userId !== user.uid) { window.location.href = 'index.html'; return; }
+
+      // All checks passed — now render page
+      renderConfirmation(order, orderId);
+
+    } catch (e) {
+      // Network error — redirect silently
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+
+</body>
+</html>

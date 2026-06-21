@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — Centraa | Karachi's Finest Dining</title>
+<meta name="description" content="Get in touch with Centraa — send us a message, find our location, hours, and answers to common questions.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ RESET & BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-surface: #111111;
+    --bg-card: #181818;
+    --gold: #c9a84c;
+    --gold-light: #e0b96a;
+    --gold-dim: #c9a84c33;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-muted: #666666;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --border: #2a2a2a;
+    --radius: 10px;
+    --transition: all 0.25s ease;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  a { text-decoration: none; color: inherit; }
+  ul { list-style: none; }
+  img { max-width: 100%; display: block; }
+  button { font-family: inherit; cursor: pointer; }
+
+  ::selection { background: var(--gold-dim); color: var(--gold-light); }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ============ REVEAL ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* ============ NAVBAR ============ */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--text-primary);
+  }
+  .nav-logo span { color: var(--gold); font-style: italic; }
+  .nav-links { display: flex; align-items: center; gap: 40px; }
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+    position: relative;
+    padding: 6px 0;
+    transition: var(--transition);
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.25s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--gold); }
+  .nav-links a.active::after { width: 100%; }
+  .nav-actions { display: flex; align-items: center; gap: 20px; }
+  .nav-icon-btn {
+    position: relative;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    font-size: 16px;
+  }
+  .nav-icon-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .cart-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 18px; height: 18px;
+    background: var(--gold);
+    color: #0a0a0a;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    display: none;
+  }
+  .nav-cta {
+    background: var(--gold);
+    color: #0a0a0a;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding: 11px 24px;
+    border-radius: 30px;
+    transition: var(--transition);
+  }
+  .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+  }
+  .nav-toggle span { width: 24px; height: 1.5px; background: var(--text-primary); transition: var(--transition); }
+
+  /* ============ HERO ============ */
+  .hero {
+    padding: 100px 0;
+    text-align: center;
+    background: radial-gradient(ellipse 60% 40% at 50% 50%,
+      rgba(201,168,76,0.06) 0%, transparent 70%);
+  }
+  .hero-label {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 18px;
+    display: block;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 54px;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+  }
+  .hero p { font-size: 18px; color: var(--text-muted); }
+
+  /* ============ MAIN TWO-COLUMN ============ */
+  .contact-main { padding: 40px 0 110px; }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+
+  /* --- FORM --- */
+  .form-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+  }
+  .form-group { margin-bottom: 22px; position: relative; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    letter-spacing: 0.2px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    transition: var(--transition);
+  }
+  .form-group textarea { min-height: 140px; resize: vertical; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--gold);
+    outline: none;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: var(--text-muted); }
+
+  .form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+  }
+
+  .form-group.error input,
+  .form-group.error select,
+  .form-group.error textarea {
+    border-color: var(--danger);
+  }
+  .form-group.error.shake { animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .error-text {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 6px;
+    display: none;
+  }
+  .form-group.error .error-text { display: block; }
+
+  .submit-error-box {
+    background: rgba(231,76,60,0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 13px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .submit-error-box.show { display: block; }
+
+  .btn-submit {
+    width: 100%;
+    height: 52px;
+    background: var(--gold);
+    color: #0a0a0a;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: none;
+    border-radius: 30px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-submit:hover:not(:disabled) { background: var(--gold-light); }
+  .btn-submit:disabled { opacity: 0.75; cursor: not-allowed; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(10,10,10,0.25);
+    border-top-color: #0a0a0a;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-submit.loading .spinner { display: inline-block; }
+  .btn-submit.loading .btn-label { display: none; }
+
+  /* --- SUCCESS STATE --- */
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .success-state.show { display: block; }
+  .success-check {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(46,204,113,0.12);
+    border: 1px solid var(--success);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 32px;
+    color: var(--success);
+    animation: popIn 0.4s ease;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .success-state h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+  .success-state p { color: var(--text-muted); font-size: 15px; margin-bottom: 28px; }
+
+  /* --- INFO COLUMN --- */
+  .info-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px; }
+  .info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: var(--transition);
+  }
+  .info-card:hover { border-left-color: var(--gold); }
+  .info-card-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .info-card-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .info-card-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .socials-block h4 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .social-icons { display: flex; gap: 12px; }
+  .social-icons a {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+  .social-icons a:hover { border-color: var(--gold); color: var(--gold); }
+  .social-icons svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ============ FAQ ============ */
+  .faq { padding: 100px 0 120px; background: var(--bg-surface); border-top: 1px solid var(--border); }
+  .faq .section-head {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .faq .section-head h2 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 36px;
+    color: var(--gold-light);
+  }
+  .faq-list { max-width: 760px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--border); }
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 4px;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: var(--transition);
+  }
+  .faq-item.active .faq-question { color: var(--gold); }
+  .faq-icon {
+    font-size: 18px;
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-left: 16px;
+    width: 20px;
+    text-align: center;
+  }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .faq-answer-inner {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 0 4px 20px;
+  }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: 70px 0 28px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: 48px;
+    margin-bottom: 50px;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .footer-logo span { color: var(--gold); font-style: italic; }
+  .footer-about p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.8;
+    max-width: 280px;
+  }
+  .footer-socials { display: flex; gap: 12px; margin-top: 20px; }
+  .footer-socials a {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    transition: var(--transition);
+  }
+  .footer-socials a:hover { border-color: var(--gold); color: var(--gold); }
+  .footer-col h4 {
+    font-size: 14px;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .footer-col ul li { margin-bottom: 12px; }
+  .footer-col ul li a { font-size: 14px; color: var(--text-muted); transition: var(--transition); }
+  .footer-col ul li a:hover { color: var(--gold); }
+  .footer-col ul li a.active { color: var(--gold); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .footer-bottom a { color: var(--text-muted); }
+  .footer-bottom a:hover { color: var(--gold); }
+  .footer-bottom-links { display: flex; gap: 24px; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 968px) {
+    .nav-links { display: none; }
+    .nav-toggle { display: flex; }
+    .contact-grid { grid-template-columns: 1fr; gap: 44px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+  }
+
+  @media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .hero { padding: 80px 0; }
+    .hero h1 { font-size: 36px; }
+    .form-card { padding: 28px 22px; }
+    .faq .section-head h2 { font-size: 28px; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">Centra<span>a</span></a>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="about.html">About</a>
+      <a href="contact.html" class="active">Contact</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="account.html" class="nav-icon-btn" aria-label="Account">👤</a>
+      <a href="cart.html" class="nav-icon-btn" aria-label="Cart">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="menu.html" class="nav-cta">Order Now</a>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container reveal">
+    <span class="hero-label">Contact Us</span>
+    <h1>Get In Touch</h1>
+    <p>We'd love to hear from you</p>
+  </div>
+</section>
+
+<!-- ============ MAIN CONTACT SECTION ============ -->
+<section class="contact-main">
+  <div class="container contact-grid">
+
+    <!-- FORM -->
+    <div class="form-card reveal">
+      <form id="contactForm" novalidate>
+        <div class="form-group" id="group-name">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" autocomplete="name">
+          <div class="error-text">Please enter at least 2 characters.</div>
+        </div>
+
+        <div class="form-group" id="group-email">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+          <div class="error-text">Please enter a valid email address.</div>
+        </div>
+
+        <div class="form-group" id="group-subject">
+          <label for="subject">Subject</label>
+          <select id="subject" name="subject">
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Order Issue">Order Issue</option>
+            <option value="Feedback">Feedback</option>
+            <option value="Catering">Catering</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="group-message">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Tell us how we can help..."></textarea>
+          <div class="error-text">Message must be at least 20 characters.</div>
+        </div>
+
+        <div class="submit-error-box" id="submitError">Something went wrong. Please try again.</div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-label">Send Message →</span>
+          <span class="spinner"></span>
+        </button>
+      </form>
+
+      <div class="success-state" id="successState">
+        <div class="success-check">✓</div>
+        <h3>Message Sent!</h3>
+        <p>We'll get back to you within 24 hours.</p>
+        <button class="btn-outline-gold-btn btn-submit" id="resetFormBtn" style="background:transparent;border:1px solid var(--gold);color:var(--gold);">
+          <span class="btn-label">Send Another Message</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div>
+      <div class="info-cards">
+        <div class="info-card reveal">
+          <div class="info-card-icon">📍</div>
+          <div>
+            <div class="info-card-label">Visit Us</div>
+            <div class="info-card-value">DHA Phase 6, Karachi</div>
+          </div>
+        </div>
+        <div class="info-card reveal reveal-delay-1">
+          <div class="info-card-icon">📞</div>
+          <div>
+            <div class="info-card-label">Call Us</div>
+            <a class="info-card-value" href="tel:+922112345678">+92 21 1234 5678</a>
+          </div>
+        </div>
+        <div class="info-card reveal reveal-delay-2">
+          <div class="info-card-icon">📧</div>
+          <div>
+            <div class="info-card-label">Email Us</div>
+            <a class="info-card-value" href="mailto:hello@centraa.pk">hello@centraa.pk</a>
+          </div>
+        </div>
+        <div class="info-card reveal reveal-delay-3">
+          <div class="info-card-icon">🕐</div>
+          <div>
+            <div class="info-card-label">Opening Hours</div>
+            <div class="info-card-value">Daily 12pm – 1am</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="socials-block reveal">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 2.1.25 2.9.55a5.9 5.9 0 0 1 2.13 1.38 5.9 5.9 0 0 1 1.38 2.13c.3.8.5 1.73.55 2.9.06 1.25.07 1.65.07 4.85s0 3.6-.07 4.85a8.95 8.95 0 0 1-.55 2.9 5.9 5.9 0 0 1-1.38 2.13 5.9 5.9 0 0 1-2.13 1.38c-.8.3-1.73.5-2.9.55-1.25.06-1.65.07-4.85.07s-3.6 0-4.85-.07a8.95 8.95 0 0 1-2.9-.55 5.9 5.9 0 0 1-2.13-1.38 5.9 5.9 0 0 1-1.38-2.13c-.3-.8-.5-1.73-.55-2.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.25-2.1.55-2.9A5.9 5.9 0 0 1 4.2 2.12a5.9 5.9 0 0 1 2.13-1.38c.8-.3 1.73-.5 2.9-.55C10.4 2.2 10.8 2.2 12 2.2zm0 1.8c-3.15 0-3.52 0-4.76.07-1 .04-1.55.21-1.9.35-.48.18-.83.4-1.19.76-.36.36-.58.71-.76 1.19-.14.36-.31.9-.35 1.9C3 9.48 3 9.85 3 13s0 3.52.07 4.76c.04 1 .21 1.55.35 1.9.18.48.4.83.76 1.19.36.36.71.58 1.19.76.36.14.9.31 1.9.35 1.24.06 1.6.07 4.76.07s3.52 0 4.76-.07c1-.04 1.55-.21 1.9-.35.48-.18.83-.4 1.19-.76.36-.36.58-.71.76-1.19.14-.36.31-.9.35-1.9.06-1.24.07-1.6.07-4.76s0-3.52-.07-4.76c-.04-1-.21-1.55-.35-1.9a3.2 3.2 0 0 0-.76-1.19 3.2 3.2 0 0 0-1.19-.76c-.36-.14-.9-.31-1.9-.35C15.52 4 15.15 4 12 4zm0 3.4a5.6 5.6 0 1 1 0 11.2 5.6 5.6 0 0 1 0-11.2zm0 1.8a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6zm5.85-2a1.3 1.3 0 1 1-2.6 0 1.3 1.3 0 0 1 2.6 0z"/></svg>
+          </a>
+          <a href="#" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M13.5 21v-7.8h2.6l.4-3.1h-3v-2c0-.9.25-1.5 1.55-1.5h1.65V3.9c-.3-.04-1.25-.12-2.4-.12-2.36 0-3.98 1.44-3.98 4.08v2.27H7.7v3.1h2.6V21h3.2z"/></svg>
+          </a>
+          <a href="#" aria-label="TikTok">
+            <svg viewBox="0 0 24 24"><path d="M16.5 2h-3.1v13.6a2.6 2.6 0 1 1-2.1-2.55v-3.1a5.7 5.7 0 1 0 5.2 5.67c0-.1 0-3.93 0-3.93a8.1 8.1 0 0 0 4.9 1.65V10.2a4.9 4.9 0 0 1-4.9-4.9V2z"/></svg>
+          </a>
+          <a href="#" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.85.5 3.58 1.4 5.07L2 22l5.2-1.5a9.86 9.86 0 0 0 4.84 1.27h.01c5.46 0 9.91-4.45 9.91-9.91A9.85 9.85 0 0 0 12.04 2zm0 17.9a8 8 0 0 1-4.07-1.12l-.29-.17-3.04.88.88-2.97-.19-.3a7.96 7.96 0 0 1-1.23-4.3c0-4.4 3.58-7.98 7.96-7.98a7.93 7.93 0 0 1 7.95 7.99c0 4.4-3.58 7.97-7.97 7.97zm4.36-5.97c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.13 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>What are your delivery hours?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">We deliver every day from 12:00 PM to 1:00 AM. Orders placed near closing time are accepted as long as our kitchen can prepare them before close.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Do you offer catering services?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes — we cater events of all sizes, from intimate gatherings to large celebrations. Reach out through the contact form and select "Catering" as your subject, and our team will get back to you with packages and pricing.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>How can I track my order?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Once your order is placed, you can track its status from the "My Account" section. You'll see live updates as it moves from preparation to delivery.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>What is your refund policy?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">If something isn't right with your order, contact us within 24 hours and our team will arrange a replacement or a refund, depending on the situation.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Do you have vegetarian options?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Absolutely. Our menu includes a dedicated selection of vegetarian dishes crafted with the same care and quality as the rest of our menu.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>How do I change or cancel my order?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Orders can be changed or cancelled within a few minutes of placing them, before kitchen preparation begins. Call us directly at +92 21 1234 5678 for the fastest response.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <div class="footer-logo">Centra<span>a</span></div>
+        <p>Karachi's finest dining experience — bold Pakistani flavours, served with refined modern hospitality.</p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="Facebook">📘</a>
+          <a href="#" aria-label="WhatsApp">💬</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html" class="active">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="contact.html">Help Center</a></li>
+          <li><a href="account.html">My Account</a></li>
+          <li><a href="cart.html">Track Order</a></li>
+          <li><a href="contact.html">FAQs</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#">DHA Phase 6, Karachi, PK</a></li>
+          <li><a href="tel:+922112345678">+92 21 1234 5678</a></li>
+          <li><a href="mailto:hello@centraa.pk">hello@centraa.pk</a></li>
+          <li><a href="#">Daily: 12PM – 1AM</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2024 Centraa. All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============ GLOBAL HELPERS ============
+  const API_BASE = 'https://centraa-backend.vercel.app';
+  const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
+  const updateCartBadge = () => {
+    const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  };
+  updateCartBadge();
+
+  // ============ MOBILE NAV TOGGLE ============
+  const navToggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  navToggle.addEventListener('click', () => {
+    const isOpen = navLinks.style.display === 'flex';
+    navLinks.style.cssText = isOpen
+      ? 'display:none;'
+      : 'display:flex; position:absolute; top:76px; left:0; right:0; flex-direction:column; background:#0a0a0a; padding:24px 32px; gap:20px; border-bottom:1px solid var(--border);';
+  });
+
+  // ============ SCROLL REVEAL ============
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ============ PREFILL FORM FROM LOGGED-IN USER ============
+  (function prefillUser() {
+    const user = getUser();
+    if (!user) return;
+    const nameEl = document.getElementById('name');
+    const emailEl = document.getElementById('email');
+    if (user.name) nameEl.value = user.name;
+    if (user.email) emailEl.value = user.email;
+  })();
+
+  // ============ CONTACT FORM ============
+  const form = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitErrorBox = document.getElementById('submitError');
+  const successState = document.getElementById('successState');
+  const resetFormBtn = document.getElementById('resetFormBtn');
+
+  function setFieldError(groupId, hasError) {
+    const group = document.getElementById(groupId);
+    group.classList.toggle('error', hasError);
+    if (hasError) {
+      group.classList.remove('shake');
+      void group.offsetWidth; // restart animation
+      group.classList.add('shake');
+    }
+  }
+
+  function validateForm() {
+    let valid = true;
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    const nameOk = name.length >= 2;
+    setFieldError('group-name', !nameOk);
+    if (!nameOk) valid = false;
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    setFieldError('group-email', !emailOk);
+    if (!emailOk) valid = false;
+
+    const messageOk = message.length >= 20;
+    setFieldError('group-message', !messageOk);
+    if (!messageOk) valid = false;
+
+    return valid;
+  }
+
+  ['name', 'email', 'message'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const groupId = 'group-' + id;
+      document.getElementById(groupId).classList.remove('error');
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitErrorBox.classList.remove('show');
+
+    if (!validateForm()) return;
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const subject = document.getElementById('subject').value || 'General Inquiry';
+    const message = document.getElementById('message').value.trim();
+
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, subject, message })
+      });
+
+      if (res.status === 404) {
+        // Fallback to mailto if endpoint doesn't exist
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+        window.location.href = `mailto:hello@centraa.pk?subject=${encodeURIComponent('New Contact Form: ' + subject)}&body=${body}`;
+        showSuccess();
+        return;
+      }
+
+      if (!res.ok) throw new Error('Request failed');
+
+      showSuccess();
+    } catch (err) {
+      submitErrorBox.classList.add('show');
+    } finally {
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+    }
+  });
+
+  function showSuccess() {
+    form.style.display = 'none';
+    successState.classList.add('show');
+  }
+
+  resetFormBtn.addEventListener('click', () => {
+    form.reset();
+    ['group-name', 'group-email', 'group-message'].forEach(id => document.getElementById(id).classList.remove('error'));
+    submitErrorBox.classList.remove('show');
+    successState.classList.remove('show');
+    form.style.display = 'block';
+    // re-prefill if logged in
+    const user = getUser();
+    if (user) {
+      if (user.name) document.getElementById('name').value = user.name;
+      if (user.email) document.getElementById('email').value = user.email;
+    }
+  });
+
+  // ============ FAQ ACCORDION ============
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    const icon = item.querySelector('.faq-icon');
+
+    question.addEventListener('click', () => {
+      const isOpen = item.classList.contains('active');
+
+      document.querySelectorAll('.faq-item').forEach(other => {
+        other.classList.remove('active');
+        other.querySelector('.faq-answer').style.maxHeight = null;
+        other.querySelector('.faq-icon').textContent = '+';
+      });
+
+      if (!isOpen) {
+        item.classList.add('active');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        icon.textContent = '−';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

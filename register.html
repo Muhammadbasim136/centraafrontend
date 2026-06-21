@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — Centraa</title>
+<meta name="description" content="Create your Centraa account to start ordering.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-surface: #111111;
+    --bg-card: #181818;
+    --gold: #c9a84c;
+    --gold-light: #e0b96a;
+    --gold-dim: #c9a84c33;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-muted: #666666;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --border: #2a2a2a;
+    --radius: 10px;
+    --transition: all 0.25s ease;
+  }
+
+html, body { min-height: 100%; }
+
+  body {
+    background: var(--bg-primary);
+    background-image: radial-gradient(ellipse 80% 60% at 50% 40%,
+      rgba(201,168,76,0.05) 0%, transparent 70%);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+
+  ::selection { background: var(--gold-dim); color: var(--gold-light); }
+
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* ============ CARD ============ */
+  .register-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 460px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: cardIn 0.5s ease forwards;
+  }
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-6px); }
+    40%,80% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  /* ============ LOGO ============ */
+  .reg-logo {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  .reg-logo span { color: var(--gold); }
+  .logo-underline {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 8px auto 32px;
+  }
+
+  /* ============ HEADING ============ */
+  .reg-heading {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .reg-heading h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 28px;
+    color: var(--text-primary);
+  }
+  .reg-heading p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  /* ============ FORM ============ */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap svg.field-icon {
+    position: absolute;
+    left: 16px; top: 50%;
+    transform: translateY(-50%);
+    width: 17px; height: 17px;
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1.6;
+    pointer-events: none;
+  }
+  .input-wrap input {
+    width: 100%;
+    height: 52px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: inherit;
+    padding: 0 16px 0 44px;
+    transition: var(--transition);
+  }
+  .input-wrap input::placeholder { color: var(--text-muted); }
+  .input-wrap input:focus {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--gold-dim);
+  }
+  .input-wrap.has-toggle input { padding-right: 46px; }
+
+  .toggle-eye {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .toggle-eye:hover { color: var(--gold); }
+  .toggle-eye svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+  .toggle-eye .eye-off { display: none; }
+  .toggle-eye.is-visible .eye-on { display: none; }
+  .toggle-eye.is-visible .eye-off { display: block; }
+
+  .field-error {
+    display: none;
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  /* ============ PASSWORD STRENGTH ============ */
+  .strength-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .strength-bar {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: var(--transition);
+  }
+  .strength-bar.weak { background: var(--danger); }
+  .strength-bar.medium { background: var(--gold); }
+  .strength-bar.strong { background: var(--success); }
+  .strength-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: none;
+  }
+  .strength-label.show { display: block; }
+  .strength-label.weak { color: var(--danger); }
+  .strength-label.medium { color: var(--gold); }
+  .strength-label.strong { color: var(--success); }
+
+  /* ============ TERMS CHECKBOX ============ */
+  .terms-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 22px;
+  }
+  .terms-row input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    min-width: 18px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-surface);
+    margin-top: 2px;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
+  }
+  .terms-row input[type="checkbox"]:checked {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .terms-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 5px; height: 9px;
+    border: solid #0a0a0a;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .terms-row label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .terms-row a { color: var(--gold); font-weight: 500; }
+  .terms-row a:hover { color: var(--gold-light); }
+  .terms-row.error input[type="checkbox"] { border-color: var(--danger); }
+  .terms-error {
+    display: none;
+    color: var(--danger);
+    font-size: 12px;
+    margin: -16px 0 18px;
+  }
+  .terms-error.show { display: block; }
+
+  /* ============ GLOBAL ERROR ============ */
+  .global-error {
+    display: none;
+    background: rgba(231,76,60,0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 13px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+
+  /* ============ SUBMIT BUTTON ============ */
+  .btn-register {
+    width: 100%;
+    height: 52px;
+    background: var(--gold);
+    color: #0a0a0a;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-register:hover:not(:disabled) { background: var(--gold-light); }
+  .btn-register:disabled { opacity: 0.75; cursor: not-allowed; }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(10,10,10,0.25);
+    border-top-color: #0a0a0a;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-register.is-loading .spinner { display: inline-block; }
+  .btn-register.is-loading .btn-label { display: none; }
+
+  /* ============ DIVIDER ============ */
+  .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+  .divider span:first-child,
+  .divider span:last-child { flex: 1; height: 1px; background: var(--border); }
+  .divider span:nth-child(2) { color: var(--text-muted); font-size: 13px; }
+
+  /* ============ LOGIN / BACK ============ */
+  .login-row {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .login-row a {
+    color: var(--gold);
+    font-weight: 700;
+    transition: var(--transition);
+  }
+  .login-row a:hover { color: var(--gold-light); }
+
+  .back-home {
+    text-align: center;
+    margin-top: 28px;
+  }
+  .back-home a {
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: var(--transition);
+  }
+  .back-home a:hover { color: var(--gold); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 480px) {
+    body { padding: 0; }
+    .register-card {
+      max-width: 100vw;
+      width: 100vw;
+      min-height: 100vh;
+      border-radius: 0;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+
+  @media (min-width: 481px) and (max-width: 600px) {
+    .register-card { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="register-card" id="registerCard">
+
+  <div class="reg-logo">CENTR<span>AA</span></div>
+  <div class="logo-underline"></div>
+
+  <div id="step-register">
+
+
+  <div class="reg-heading">
+    <h1>Create Account</h1>
+    <p>Join Centraa and start ordering</p>
+  </div>
+
+  <div class="global-error" id="globalError"></div>
+
+  <form id="registerForm" novalidate>
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <div class="input-wrap">
+        <svg class="field-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="text" id="name" name="name" placeholder="Enter your full name" autocomplete="name">
+      </div>
+      <div class="field-error" id="nameError"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <div class="input-wrap">
+        <svg class="field-icon" viewBox="0 0 24 24"><path d="M3 6.5l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field-error" id="emailError"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Phone Number</label>
+      <div class="input-wrap">
+        <svg class="field-icon" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v3a2 2 0 0 1-2 2A15 15 0 0 1 4 7a2 2 0 0 1 1-3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="tel" id="phone" name="phone" placeholder="03XX XXXXXXX" autocomplete="tel">
+      </div>
+      <div class="field-error" id="phoneError"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="input-wrap has-toggle">
+        <svg class="field-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password">
+        <button type="button" class="toggle-eye" id="togglePassword" aria-label="Show password">
+          <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.88 5.1A11 11 0 0 1 12 5c7 0 11 7 11 7a13.4 13.4 0 0 1-3.06 3.94M6.6 6.6A13.4 13.4 0 0 0 1 12s4 7 11 7a10.6 10.6 0 0 0 5.4-1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="strength-row" id="strengthRow">
+        <div class="strength-bar" id="bar1"></div>
+        <div class="strength-bar" id="bar2"></div>
+        <div class="strength-bar" id="bar3"></div>
+      </div>
+      <div class="strength-label" id="strengthLabel"></div>
+      <div class="field-error" id="passwordError"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <div class="input-wrap has-toggle">
+        <svg class="field-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password">
+        <button type="button" class="toggle-eye" id="toggleConfirmPassword" aria-label="Show password">
+          <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.88 5.1A11 11 0 0 1 12 5c7 0 11 7 11 7a13.4 13.4 0 0 1-3.06 3.94M6.6 6.6A13.4 13.4 0 0 0 1 12s4 7 11 7a10.6 10.6 0 0 0 5.4-1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="field-error" id="confirmPasswordError"></div>
+    </div>
+
+    <div class="terms-row" id="termsRow">
+      <input type="checkbox" id="terms" name="terms">
+      <label for="terms">I agree to Centraa's <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a></label>
+    </div>
+    <div class="terms-error" id="termsError">Please accept the Terms &amp; Conditions to continue.</div>
+
+    <button type="submit" class="btn-register" id="registerBtn">
+      <span class="btn-label">Create Account</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+</div>
+
+  <!-- STEP 2: VERIFY EMAIL CODE -->
+  <div id="step-verify" style="display:none;">
+    <div class="reg-heading">
+      <h1>Verify Your Email</h1>
+      <p id="verifySubtitle">We sent a 6-digit code to your email</p>
+    </div>
+
+    <div class="global-error" id="verifyGlobalError"></div>
+
+    <form id="verifyForm" novalidate>
+      <div class="form-group">
+        <label for="verifyCode">Verification Code</label>
+        <div class="input-wrap">
+          <input type="text" id="verifyCode" placeholder="6-digit code" maxlength="6" inputmode="numeric" style="padding-left:16px;">
+        </div>
+        <div class="field-error" id="verifyCodeError"></div>
+      </div>
+
+      <button type="submit" class="btn-register" id="verifyBtn">
+        <span class="btn-label">Verify & Continue</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="login-row" style="margin-top:18px;">
+      Didn't get the code?
+      <a href="#" id="resendCodeLink">Resend Code</a>
+    </div>
+  </div>
+
+  <div class="divider"><span></span><span>or</span><span></span></div>
+
+  <div class="login-row">
+    Already have an account? <a href="login.html">Sign In</a>
+  </div>
+
+  <div class="back-home">
+    <a href="index.html">← Back to Home</a>
+  </div>
+
+</div>
+
+<script>
+  // ============ GLOBAL HELPERS ============
+  const API_BASE = 'https://centraa-backend.vercel.app';
+  const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
+  const updateCartBadge = () => {
+    const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  };
+
+  // ============ AUTH GUARD ============
+  (function authGuard() {
+    const user = getUser();
+    if (user) {
+      window.location.href = 'index.html';
+    }
+  })();
+
+  const params = new URLSearchParams(window.location.search);
+  const redirectTo = params.get('redirect') || 'index.html';
+
+  // ============ ELEMENT REFS ============
+  const registerForm = document.getElementById('registerForm');
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const termsCheckbox = document.getElementById('terms');
+  const termsRow = document.getElementById('termsRow');
+  const termsError = document.getElementById('termsError');
+  const globalErrorEl = document.getElementById('globalError');
+  const registerBtn = document.getElementById('registerBtn');
+
+  // ============ PASSWORD VISIBILITY ============
+  function wireToggle(btnId, inputEl) {
+    const btn = document.getElementById(btnId);
+    btn.addEventListener('click', () => {
+      const isVisible = inputEl.type === 'text';
+      inputEl.type = isVisible ? 'password' : 'text';
+      btn.classList.toggle('is-visible', !isVisible);
+      btn.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+    });
+  }
+  wireToggle('togglePassword', passwordInput);
+  wireToggle('toggleConfirmPassword', confirmPasswordInput);
+
+  // ============ PASSWORD STRENGTH ============
+  const bar1 = document.getElementById('bar1');
+  const bar2 = document.getElementById('bar2');
+  const bar3 = document.getElementById('bar3');
+  const strengthLabel = document.getElementById('strengthLabel');
+
+  function getStrength(pw) {
+    if (!pw) return 0;
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10 && /[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+    if (pw.length >= 10 && /[^A-Za-z0-9]/.test(pw)) score++;
+    return Math.min(score, 3);
+  }
+
+  passwordInput.addEventListener('input', () => {
+    const pw = passwordInput.value;
+    [bar1, bar2, bar3].forEach(b => b.className = 'strength-bar');
+    strengthLabel.className = 'strength-label';
+
+    if (!pw) { strengthLabel.classList.remove('show'); return; }
+
+    const score = getStrength(pw);
+    let level = 'weak', label = 'Weak password';
+    if (score === 2) { level = 'medium'; label = 'Medium strength'; }
+    if (score >= 3) { level = 'strong'; label = 'Strong password'; }
+
+    const bars = [bar1, bar2, bar3];
+    const fillCount = score === 0 ? 1 : score;
+    for (let i = 0; i < fillCount; i++) bars[i].classList.add(level);
+
+    strengthLabel.textContent = label;
+    strengthLabel.classList.add('show', level);
+  });
+
+  // ============ REGISTER ============
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  function validatePhone(phone) {
+    return /^03[0-9]{9}$/.test(phone.replace(/\s/g, ''));
+  }
+
+  function showFieldError(input, errorId, msg) {
+    input.style.borderColor = 'var(--danger)';
+    const err = document.getElementById(errorId);
+    if (err) { err.textContent = msg; err.style.display = 'block'; }
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  }
+
+  function clearFieldError(input, errorId) {
+    input.style.borderColor = '';
+    const err = document.getElementById(errorId);
+    if (err) err.style.display = 'none';
+  }
+
+  function clearErrors() {
+    [
+      [nameInput, 'nameError'],
+      [emailInput, 'emailError'],
+      [phoneInput, 'phoneError'],
+      [passwordInput, 'passwordError'],
+      [confirmPasswordInput, 'confirmPasswordError']
+    ].forEach(([input, errId]) => clearFieldError(input, errId));
+    termsRow.classList.remove('error');
+    termsError.classList.remove('show');
+    globalErrorEl.style.display = 'none';
+  }
+
+  function showGlobalError(msg) {
+    globalErrorEl.textContent = msg;
+    globalErrorEl.style.display = 'block';
+  }
+
+  function shakeCard() {
+    const card = document.getElementById('registerCard');
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+  }
+
+  function setLoading(state) {
+    registerBtn.disabled = state;
+    registerBtn.classList.toggle('is-loading', state);
+  }
+
+  [nameInput, emailInput, phoneInput, passwordInput, confirmPasswordInput].forEach(input => {
+    input.addEventListener('input', () => {
+      input.style.borderColor = '';
+      const err = input.closest('.form-group').querySelector('.field-error');
+      if (err) err.style.display = 'none';
+    });
+  });
+
+  termsCheckbox.addEventListener('change', () => {
+    termsRow.classList.remove('error');
+    termsError.classList.remove('show');
+  });
+
+  function validateForm() {
+    let valid = true;
+    let firstInvalid = null;
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    if (name.length < 2) {
+      showFieldError(nameInput, 'nameError', 'Enter your full name (min 2 characters)');
+      if (!firstInvalid) firstInvalid = nameInput;
+      valid = false;
+    }
+
+    if (!email || !validateEmail(email)) {
+      showFieldError(emailInput, 'emailError', 'Enter a valid email address');
+      if (!firstInvalid) firstInvalid = emailInput;
+      valid = false;
+    }
+
+    if (!phone || !validatePhone(phone)) {
+      showFieldError(phoneInput, 'phoneError', 'Enter a valid Pakistani phone number (03XXXXXXXXX)');
+      if (!firstInvalid) firstInvalid = phoneInput;
+      valid = false;
+    }
+
+    if (!password || password.length < 6) {
+      showFieldError(passwordInput, 'passwordError', 'Password must be at least 6 characters');
+      if (!firstInvalid) firstInvalid = passwordInput;
+      valid = false;
+    }
+
+    if (!confirmPassword || confirmPassword !== password) {
+      showFieldError(confirmPasswordInput, 'confirmPasswordError', 'Passwords do not match');
+      if (!firstInvalid) firstInvalid = confirmPasswordInput;
+      valid = false;
+    }
+
+    if (!termsCheckbox.checked) {
+      termsRow.classList.add('error');
+      termsError.classList.add('show');
+      if (!firstInvalid) firstInvalid = termsCheckbox;
+      valid = false;
+    }
+
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    return valid;
+  }
+
+  registerForm.addEventListener('submit', handleRegister);
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    clearErrors();
+
+    if (!validateForm()) return;
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const phone = phoneInput.value.trim();
+    const password = passwordInput.value;
+
+    setLoading(true);
+
+    try {
+const res = await fetch(`${API_BASE}/api/auth/register`, {        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, password })
+      });
+
+const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 409) {
+          showFieldError(emailInput, 'emailError', 'An account with this email already exists');
+          emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          showGlobalError(data.error || 'Registration failed. Please try again.');
+          shakeCard();
+        }
+        return;
+      }
+
+      // Success — account created, but NOT logged in yet. Move to email verification.
+      registeredEmail = email;
+      document.getElementById('verifySubtitle').textContent = `We sent a 6-digit code to ${email}`;
+      if (!data.emailSent) {
+        document.getElementById('verifyGlobalError').textContent = 'Could not send the email automatically — tap "Resend Code" to try again.';
+        document.getElementById('verifyGlobalError').style.display = 'block';
+      }
+      showStep('verify');
+
+    } catch (err) {
+      showGlobalError('Network error. Please check your connection.');
+      shakeCard();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ============ STEP SWITCHING ============
+  let registeredEmail = '';
+
+  function showStep(step) {
+    document.getElementById('step-register').style.display = step === 'register' ? 'block' : 'none';
+    document.getElementById('step-verify').style.display = step === 'verify' ? 'block' : 'none';
+  }
+
+  // ============ STEP 2: VERIFY CODE ============
+  document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const code = document.getElementById('verifyCode').value.trim();
+    const verifyCodeError = document.getElementById('verifyCodeError');
+    const verifyGlobalError = document.getElementById('verifyGlobalError');
+    const verifyBtn = document.getElementById('verifyBtn');
+
+    verifyCodeError.style.display = 'none';
+    verifyGlobalError.style.display = 'none';
+
+    if (!/^[0-9]{6}$/.test(code)) {
+      verifyCodeError.textContent = 'Enter the 6-digit code';
+      verifyCodeError.style.display = 'block';
+      return;
+    }
+
+    verifyBtn.disabled = true;
+    verifyBtn.classList.add('is-loading');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/verify-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: registeredEmail, code })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        verifyGlobalError.textContent = data.error || 'Invalid or expired code.';
+        verifyGlobalError.style.display = 'block';
+        return;
+      }
+
+      // Verified — now actually logged in. Save token + user.
+      localStorage.setItem('centraa_token', data.token);
+      localStorage.setItem('centraa_user', JSON.stringify(data.user));
+
+      window.location.href = redirectTo;
+
+    } catch (err) {
+      verifyGlobalError.textContent = 'Network error. Please check your connection.';
+      verifyGlobalError.style.display = 'block';
+    } finally {
+      verifyBtn.disabled = false;
+      verifyBtn.classList.remove('is-loading');
+    }
+  });
+
+  // ============ RESEND CODE ============
+  document.getElementById('resendCodeLink').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const link = e.target;
+    const verifyGlobalError = document.getElementById('verifyGlobalError');
+
+    link.textContent = 'Sending...';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/resend-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: registeredEmail })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        verifyGlobalError.textContent = data.error || 'Could not resend code.';
+        verifyGlobalError.style.display = 'block';
+        return;
+      }
+
+      verifyGlobalError.style.display = 'none';
+      link.textContent = 'Code sent ✓';
+
+      // small cooldown so they can't spam it
+      let seconds = 30;
+      link.style.pointerEvents = 'none';
+      const interval = setInterval(() => {
+        seconds--;
+        link.textContent = `Resend in ${seconds}s`;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          link.textContent = 'Resend Code';
+          link.style.pointerEvents = 'auto';
+        }
+      }, 1000);
+
+    } catch (err) {
+      verifyGlobalError.textContent = 'Network error. Please try again.';
+      verifyGlobalError.style.display = 'block';
+      link.textContent = 'Resend Code';
+    }
+  });
+</script>
+
+</body>
+</html>

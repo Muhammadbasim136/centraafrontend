@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centraa</title>
+<meta name="description" content="View dish details, reviews and nutrition information at Centraa.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a0a'/%3E%3Ctext x='50' y='70' font-family='Georgia,serif' font-size='62' fill='%23c9a84c' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ ROOT / RESET ============ */
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-surface: #111111;
+    --bg-card: #181818;
+    --gold: #c9a84c;
+    --gold-light: #e0b96a;
+    --gold-dim: #c9a84c33;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-muted: #666666;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --border: #2a2a2a;
+    --radius: 10px;
+    --transition: all 0.25s ease;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  h1, h2, h3 { margin: 0; font-family: 'Playfair Display', serif; }
+  p { margin: 0; }
+
+  :focus-visible {
+    outline: 2px solid var(--gold-light);
+    outline-offset: 3px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseHeart {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.28); }
+    100% { transform: scale(1); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -420px 0; }
+    100% { background-position: 420px 0; }
+  }
+  @keyframes bump {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  .skel {
+    background: linear-gradient(90deg, var(--bg-card) 25%, #232323 37%, var(--bg-card) 63%);
+    background-size: 420px 100%;
+    animation: shimmer 1.4s ease infinite;
+    border-radius: 8px;
+  }
+
+  /* ============ NAVBAR ============ */
+  /* Reused identically across index.html / menu.html / product.html / cart.html */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 10, 0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 74px;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .logo span { color: var(--gold); }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+  }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    position: relative;
+    padding: 6px 0;
+    transition: var(--transition);
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+  .nav-links a.active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 1.5px;
+    background: var(--gold);
+  }
+  .nav-actions { display: flex; align-items: center; gap: 20px; }
+  .nav-icon-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    color: var(--text-primary);
+    transition: var(--transition);
+  }
+  .nav-icon-btn:hover { background: var(--bg-card); color: var(--gold); }
+  .nav-icon-btn svg { width: 19px; height: 19px; }
+  .cart-badge {
+    position: absolute;
+    top: -2px; right: -2px;
+    min-width: 17px; height: 17px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #0a0a0a;
+    font-size: 10px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+  }
+  .account-text { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+  .hamburger-btn { display: none; width: 38px; height: 38px; align-items: center; justify-content: center; }
+  .hamburger-btn svg { width: 22px; height: 22px; }
+
+  .mobile-nav-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 150;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .mobile-nav {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(78vw, 320px);
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border);
+    z-index: 151;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  body.menu-open .mobile-nav-backdrop { opacity: 1; pointer-events: auto; }
+  body.menu-open .mobile-nav { transform: translateX(0); }
+  .mobile-nav-close { align-self: flex-end; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }
+  .mobile-nav-links { display: flex; flex-direction: column; gap: 22px; }
+  .mobile-nav-links a { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .mobile-nav-links a.active { color: var(--gold); }
+
+  /* ============ BREADCRUMB ============ */
+  .breadcrumb {
+    padding: 22px 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .breadcrumb a { color: var(--text-muted); transition: var(--transition); }
+  .breadcrumb a:hover { color: var(--gold); }
+  .breadcrumb .crumb-current { color: var(--gold); }
+  .breadcrumb .skel { width: 110px; height: 13px; display: inline-block; }
+
+  /* ============ PRODUCT MAIN ============ */
+  .product-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    padding: 32px 0 56px;
+  }
+
+  /* -- Gallery -- */
+  .gallery-skeleton { height: 500px; }
+  .gallery-content { display: none; }
+  body.state-loaded .gallery-content { display: block; }
+
+  .gallery-main-wrapper {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--gold-dim);
+    height: 500px;
+    background: var(--bg-card);
+    transition: border-color 0.3s ease;
+  }
+  .gallery-main-wrapper:hover { border-color: var(--gold); }
+  .gallery-main-wrapper::before,
+  .gallery-main-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 26px; height: 26px;
+    border: 0px solid var(--gold);
+    opacity: 0;
+    transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .gallery-main-wrapper::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+  .gallery-main-wrapper::after { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+  .gallery-main-wrapper:hover::before,
+  .gallery-main-wrapper:hover::after { opacity: 1; width: 34px; height: 34px; }
+
+  #mainImage {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease, opacity 0.2s ease;
+  }
+  .gallery-main-wrapper:hover #mainImage { transform: scale(1.02); }
+
+  .image-placeholder {
+    width: 100%; height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    color: var(--gold);
+  }
+  .image-placeholder.show { display: flex; }
+  .image-placeholder svg { width: 56px; height: 56px; opacity: 0.7; }
+
+  .category-badge {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: var(--gold);
+    color: #0a0a0a;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    z-index: 2;
+  }
+  .wishlist-btn {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(10,10,10,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.12);
+    z-index: 2;
+    transition: var(--transition);
+  }
+  .wishlist-btn:hover { background: rgba(10,10,10,0.85); }
+  .wishlist-btn svg { width: 19px; height: 19px; stroke: #fff; fill: none; transition: var(--transition); }
+  .wishlist-btn.active svg { fill: var(--gold); stroke: var(--gold); }
+  .wishlist-btn.pulse svg { animation: pulseHeart 0.35s ease; }
+
+  .thumbnail-strip {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .thumbnail-strip img {
+    width: 70px; height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: var(--transition);
+  }
+  .thumbnail-strip img:hover { opacity: 1; }
+  .thumbnail-strip img.active { border-color: var(--gold); opacity: 1; }
+
+  /* -- Info column -- */
+  .info-skeleton { display: flex; flex-direction: column; gap: 16px; padding-top: 4px; }
+  .info-skeleton .skel:nth-child(1) { width: 90px; height: 22px; border-radius: 999px; }
+  .info-skeleton .skel:nth-child(2) { width: 70%; height: 34px; }
+  .info-skeleton .skel:nth-child(3) { width: 40%; height: 16px; }
+  .info-skeleton .skel:nth-child(4) { width: 35%; height: 30px; }
+  .info-skeleton .skel:nth-child(5) { width: 100%; height: 52px; margin-top: 10px; }
+
+  .info-content { display: none; }
+  body.state-loaded .info-content { display: block; }
+
+  .info-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .info-category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+
+  .product-name {
+    font-style: italic;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .stars { color: var(--gold); font-size: 15px; letter-spacing: 1px; }
+  .stars .empty { color: var(--text-muted); opacity: 0.5; }
+  .rating-number { color: var(--text-secondary); font-weight: 600; }
+
+  .price {
+    color: var(--gold);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .stock-status { font-size: 14px; font-weight: 600; margin-bottom: 22px; display: flex; align-items: center; gap: 6px; }
+  .stock-status.in-stock { color: var(--success); }
+  .stock-status.out-stock { color: var(--danger); }
+  .stock-status .stock-left { color: var(--text-muted); font-weight: 400; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+  .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .qty-label { font-size: 13px; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.3px; }
+  .qty-selector { display: flex; align-items: center; gap: 14px; }
+  .qty-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .qty-btn:hover:not(:disabled) { background: var(--gold); color: #0a0a0a; }
+  .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .qty-value { min-width: 36px; text-align: center; font-size: 17px; font-weight: 700; }
+  .qty-value.bump { animation: bump 0.2s ease; }
+
+  .btn-add-cart {
+    width: 100%; height: 52px;
+    background: var(--gold);
+    color: #0a0a0a;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-add-cart:hover:not(:disabled) { background: var(--gold-light); }
+  .btn-add-cart:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-add-cart.is-success { background: var(--success); color: #fff; }
+  .btn-add-cart .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(10,10,10,0.3);
+    border-top-color: #0a0a0a;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+  .btn-add-cart.is-loading .spinner { display: block; }
+  .btn-add-cart.is-loading .btn-label { display: none; }
+
+  .btn-go-cart {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; height: 0;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    border-radius: var(--radius);
+    font-size: 14px; font-weight: 600;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition: all 0.35s ease;
+  }
+  .btn-go-cart.visible { height: 48px; opacity: 1; margin-top: 12px; }
+  .btn-go-cart:hover { background: var(--gold-dim); }
+
+  .info-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .info-pill {
+    flex: 1 1 150px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .info-pill .pill-icon { font-size: 16px; }
+
+  /* ============ TABS ============ */
+  .tabs-section { padding-bottom: 56px; }
+  .tabs-skeleton { display: flex; gap: 14px; margin-bottom: 28px; }
+  .tabs-skeleton .skel { width: 120px; height: 38px; border-radius: 999px; }
+  .tabs-content { display: none; }
+  body.state-loaded .tabs-content { display: block; }
+
+  .tabs-nav {
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    background: none; border: none;
+    color: var(--text-muted);
+    font-size: 15px; font-weight: 600;
+    padding: 14px 2px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text-secondary); }
+  .tab-btn.active { color: var(--gold); }
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  .description-text {
+    color: var(--text-secondary);
+    line-height: 1.75;
+    font-size: 15px;
+    white-space: pre-line;
+  }
+  .ingredient-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .ingredient-tag {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 13px;
+    padding: 6px 13px;
+    border-radius: 999px;
+  }
+
+  /* -- Reviews -- */
+  .reviews-summary {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding: 26px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 32px;
+  }
+  .summary-score { text-align: center; min-width: 130px; }
+  .summary-score .big-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 46px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .summary-score .stars { display: block; margin: 8px 0 6px; font-size: 16px; }
+  .summary-score .summary-count { font-size: 13px; color: var(--text-muted); }
+  .summary-bars { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 9px; justify-content: center; }
+  .bar-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-secondary); }
+  .bar-row .bar-label { width: 30px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--gold); border-radius: 4px; width: 0%; transition: width 0.7s ease; }
+  .bar-row .bar-count { width: 26px; text-align: right; flex-shrink: 0; color: var(--text-muted); }
+
+  .review-list { margin-bottom: 8px; }
+  .review-card { padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .review-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .review-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .review-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+  .review-date { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .review-stars { color: var(--gold); font-size: 13px; margin-bottom: 6px; }
+  .review-text { color: var(--text-secondary); font-size: 14px; line-height: 1.65; }
+  .no-reviews-msg { color: var(--text-muted); font-size: 14px; padding: 18px 0; }
+
+  .write-review { margin-top: 28px; padding-top: 26px; border-top: 1px solid var(--border); }
+  .write-review h3 { font-size: 17px; font-weight: 600; font-style: italic; margin-bottom: 16px; color: var(--text-primary); }
+  .star-picker { display: flex; gap: 6px; margin-bottom: 16px; }
+  .star-picker span { font-size: 26px; color: var(--text-muted); cursor: pointer; transition: color 0.15s ease; }
+  .star-picker span.filled { color: var(--gold); }
+  .review-textarea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 12px 14px;
+    resize: vertical;
+    margin-bottom: 14px;
+    transition: var(--transition);
+  }
+  .review-textarea:focus { border-color: var(--gold); outline: none; }
+  .review-textarea::placeholder { color: var(--text-muted); }
+  .btn-submit-review {
+    background: var(--gold);
+    color: #0a0a0a;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-submit-review:hover { background: var(--gold-light); }
+  .btn-submit-review:disabled { opacity: 0.5; cursor: not-allowed; }
+  .form-message { margin-top: 12px; font-size: 13.5px; display: none; }
+  .form-message.show { display: block; }
+  .form-message.success { color: var(--success); }
+  .form-message.error { color: var(--danger); }
+  .login-prompt { color: var(--text-muted); font-size: 14px; }
+  .login-prompt a { color: var(--gold); font-weight: 600; }
+  .login-prompt a:hover { text-decoration: underline; }
+
+  /* -- Nutrition -- */
+  .nutrition-table { width: 100%; border-collapse: collapse; border-radius: var(--radius); overflow: hidden; }
+  .nutrition-table th, .nutrition-table td { padding: 13px 18px; text-align: left; font-size: 14px; }
+  .nutrition-table thead th { color: var(--gold); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border); }
+  .nutrition-table tbody tr:nth-child(odd) { background: #111111; }
+  .nutrition-table tbody tr:nth-child(even) { background: #161616; }
+  .nutrition-table td:last-child { color: var(--text-secondary); }
+  .nutrition-note { margin-top: 16px; font-size: 13px; color: var(--text-muted); font-style: italic; }
+
+  /* ============ RELATED ============ */
+  .related-section { padding-bottom: 64px; }
+  .related-section.hidden { display: none; }
+  .related-heading {
+    font-style: italic;
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--gold);
+    margin-bottom: 22px;
+  }
+  .related-skeleton { display: flex; gap: 18px; }
+  .related-skeleton .skel { flex: 0 0 200px; height: 240px; border-radius: var(--radius); }
+  .related-content { display: none; }
+  body.state-loaded .related-content { display: block; }
+
+  .related-row {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .related-row::-webkit-scrollbar { display: none; }
+  .related-card {
+    flex: 0 0 200px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  .related-card:hover { transform: translateY(-4px); border-color: var(--gold-dim); }
+  .related-card a.rc-image-link { display: block; }
+  .related-card img { width: 100%; height: 140px; object-fit: cover; background: var(--bg-surface); }
+  .related-card .rc-body { padding: 13px; }
+  .related-card .rc-name {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .related-card .rc-price { color: var(--gold); font-weight: 700; font-size: 14px; margin-bottom: 11px; }
+  .related-card button {
+    width: 100%; height: 36px;
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    border-radius: 8px;
+    font-size: 12.5px; font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .related-card button:hover { background: var(--gold); color: #0a0a0a; }
+  .related-card button.added { background: var(--success); border-color: var(--success); color: #fff; }
+
+  /* ============ ERROR PAGE ============ */
+  .error-page {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 110px 20px;
+    min-height: 50vh;
+  }
+  body.state-error .page-content { display: none; }
+  body.state-error .error-page { display: flex; }
+  .error-code {
+    font-family: 'Playfair Display', serif;
+    font-size: 100px;
+    font-weight: 700;
+    color: var(--gold-dim);
+    line-height: 1;
+  }
+  .error-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text-primary); margin: 14px 0 8px; }
+  .error-desc { color: var(--text-muted); margin-bottom: 30px; font-size: 14px; max-width: 360px; }
+  .btn-browse-menu {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold);
+    color: #0a0a0a;
+    padding: 13px 28px;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 14px;
+    transition: var(--transition);
+  }
+  .btn-browse-menu:hover { background: var(--gold-light); }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: 56px 0 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+  .footer-brand .logo { display: inline-block; margin-bottom: 14px; }
+  .footer-tagline { color: var(--text-muted); font-size: 13.5px; line-height: 1.7; max-width: 280px; margin-bottom: 18px; }
+  .footer-social { display: flex; gap: 12px; }
+  .footer-social a {
+    width: 34px; height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+  .footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+  .footer-social svg { width: 15px; height: 15px; }
+  .footer-heading { font-size: 13px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-primary); margin-bottom: 18px; }
+  .footer-links { display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a { color: var(--text-muted); font-size: 14px; transition: var(--transition); }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-contact { display: flex; flex-direction: column; gap: 12px; color: var(--text-muted); font-size: 14px; }
+  .footer-contact a { color: var(--text-muted); transition: var(--transition); }
+  .footer-contact a:hover { color: var(--gold); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .footer-bottom a { color: var(--text-muted); }
+  .footer-bottom a:hover { color: var(--gold); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 960px) {
+    .product-main { grid-template-columns: 1fr; gap: 32px; }
+    .nav-links { display: none; }
+    .hamburger-btn { display: flex; }
+    .account-text { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    .container { padding: 0 18px; }
+    .product-name { font-size: 24px; }
+    .gallery-main-wrapper, .gallery-skeleton { height: 340px; }
+    .image-placeholder svg { width: 44px; height: 44px; }
+    .reviews-summary { flex-direction: column; gap: 20px; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .related-card { flex: 0 0 165px; }
+    .error-code { font-size: 72px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body class="state-loading">
+
+<!-- ============ NAVBAR ============ -->
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="logo">CENTR<span>AA</span></a>
+
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="menu.html" class="active">Menu</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a href="account.html" class="nav-icon-btn" id="accountLink" aria-label="Account">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </a>
+      <span class="account-text" id="accountText"></span>
+      <a href="cart.html" class="nav-icon-btn" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+        <span class="cart-badge">0</span>
+      </a>
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav-backdrop" id="mobileBackdrop"></div>
+<aside class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <nav class="mobile-nav-links">
+    <a href="index.html">Home</a>
+    <a href="menu.html" class="active">Menu</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="account.html">Account</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="page-content">
+    <div class="container">
+
+      <!-- ============ BREADCRUMB ============ -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span>&gt;</span>
+        <a href="menu.html">Menu</a>
+        <span>&gt;</span>
+        <span class="skel" id="breadcrumbSkel"></span>
+        <span class="crumb-current" id="breadcrumbName" style="display:none;"></span>
+      </nav>
+
+      <!-- ============ PRODUCT MAIN ============ -->
+      <div class="product-main">
+
+        <!-- Gallery -->
+        <div class="gallery">
+          <div class="gallery-skeleton skel"></div>
+          <div class="gallery-content">
+            <div class="gallery-main-wrapper">
+              <img id="mainImage" alt="">
+              <div class="image-placeholder" id="imagePlaceholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2v8a2 2 0 0 0 2 2v10M10 2v6M14 2v6"/><path d="M18 2c-2 1-3 3-3 6s1 5 3 6v8"/></svg>
+              </div>
+              <span class="category-badge" id="categoryBadge"></span>
+              <button class="wishlist-btn" id="wishlistBtn" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.8-9.4C0.6 7.6 2.3 4 6 4c2.1 0 3.6 1.2 4.5 2.4C11.4 5.2 12.9 4 15 4c3.7 0 5.4 3.6 3.8 7.1C19.5 15.9 12 20.5 12 20.5Z" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="thumbnail-strip" id="thumbnailStrip" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="info">
+          <div class="info-skeleton">
+            <div class="skel"></div>
+            <div class="skel"></div>
+            <div class="skel"></div>
+            <div class="skel"></div>
+            <div class="skel"></div>
+          </div>
+          <div class="info-content">
+            <div class="info-top-row">
+              <span class="info-category-pill" id="infoCategoryPill"></span>
+            </div>
+
+            <h1 class="product-name" id="productName"></h1>
+
+            <div class="rating-row" id="ratingRow">
+              <span class="stars" id="ratingStars"></span>
+              <span id="ratingText"></span>
+            </div>
+
+            <div class="price" id="productPrice"></div>
+
+            <div class="stock-status" id="stockStatus"></div>
+
+            <hr class="divider">
+
+            <div class="qty-row">
+              <span class="qty-label">Quantity</span>
+              <div class="qty-selector">
+                <button class="qty-btn" id="qtyMinus" aria-label="Decrease quantity">&minus;</button>
+                <span class="qty-value" id="qtyValue">1</span>
+                <button class="qty-btn" id="qtyPlus" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <button class="btn-add-cart" id="addToCartBtn">
+              <span class="spinner"></span>
+              <span class="btn-label" id="addToCartLabel">Add to Cart</span>
+            </button>
+            <a href="cart.html" class="btn-go-cart" id="goToCartBtn">Go to Cart &rarr;</a>
+
+            <hr class="divider">
+
+            <div class="info-pills">
+              <div class="info-pill"><span class="pill-icon">&#128336;</span> Prep time: 15&ndash;20 mins</div>
+              <div class="info-pill"><span class="pill-icon">&#128653;</span> Delivery: Rs. 150</div>
+              <div class="info-pill"><span class="pill-icon">&#128260;</span> Free on orders above Rs. 1,000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ TABS ============ -->
+      <section class="tabs-section">
+        <div class="tabs-skeleton">
+          <div class="skel"></div>
+          <div class="skel"></div>
+          <div class="skel"></div>
+        </div>
+        <div class="tabs-content">
+          <div class="tabs-nav" role="tablist">
+            <button class="tab-btn active" data-tab="description" role="tab">Description</button>
+            <button class="tab-btn" data-tab="reviews" role="tab">Reviews <span id="reviewCountLabel">(0)</span></button>
+            <button class="tab-btn" data-tab="nutrition" role="tab">Nutrition</button>
+          </div>
+
+          <div class="tab-panel active" data-panel="description">
+            <p class="description-text" id="descriptionText"></p>
+            <div class="ingredient-tags" id="ingredientTags" style="display:none;"></div>
+          </div>
+
+          <div class="tab-panel" data-panel="reviews">
+            <div class="reviews-summary" id="reviewsSummary">
+              <div class="summary-score">
+                <div class="big-number" id="avgRatingNumber">0.0</div>
+                <span class="stars" id="summaryStars"></span>
+                <div class="summary-count" id="summaryCount">No reviews yet</div>
+              </div>
+              <div class="summary-bars" id="summaryBars"></div>
+            </div>
+
+            <div class="review-list" id="reviewList"></div>
+
+            <div class="write-review" id="writeReviewSection"></div>
+          </div>
+
+          <div class="tab-panel" data-panel="nutrition">
+            <table class="nutrition-table">
+              <thead>
+                <tr><th>Nutrient</th><th>Amount</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Calories</td><td>650 kcal</td></tr>
+                <tr><td>Protein</td><td>32 g</td></tr>
+                <tr><td>Carbohydrates</td><td>48 g</td></tr>
+                <tr><td>Fat</td><td>28 g</td></tr>
+                <tr><td>Sodium</td><td>820 mg</td></tr>
+              </tbody>
+            </table>
+            <p class="nutrition-note">Nutritional values are approximate and may vary.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RELATED ============ -->
+      <section class="related-section" id="relatedSection">
+        <h2 class="related-heading">You Might Also Like</h2>
+        <div class="related-skeleton">
+          <div class="skel"></div>
+          <div class="skel"></div>
+          <div class="skel"></div>
+          <div class="skel"></div>
+        </div>
+        <div class="related-content">
+          <div class="related-row" id="relatedRow"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============ ERROR PAGE ============ -->
+  <div class="error-page">
+    <div class="error-code">404</div>
+    <h2 class="error-title">Product not found</h2>
+    <p class="error-desc">This item may have been removed from our menu.</p>
+    <a href="menu.html" class="btn-browse-menu">Browse Menu &rarr;</a>
+  </div>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="logo">CENTR<span>AA</span></a>
+      <p class="footer-tagline">Modern Pakistani flavours, plated with a little luxury. Made fresh, delivered with care.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 8h-2a2 2 0 0 0-2 2v10M9 13h5"/><circle cx="12" cy="12" r="10"/></svg></a>
+        <a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-4.2-7.6"/><path d="M21 12 12 12 8 21l1.5-6"/></svg></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading">Quick Links</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="index.html#about">About Us</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading">Contact</div>
+      <div class="footer-contact">
+        <a href="tel:+922112345678">+92 21 1234 5678</a>
+        <a href="mailto:hello@centraa.pk">hello@centraa.pk</a>
+        <span>DHA Phase 6, Karachi</span>
+        <span>Daily, 12pm &ndash; 1am</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>&copy; 2026 Centraa. All rights reserved.</span>
+    <span>Made with &hearts; in Karachi</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ SHARED HELPERS (same on every page) ============ */
+  const API_BASE = 'https://centraa-backend.vercel.app';
+  const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
+  const authHeaders = () => {
+    const u = getUser();
+    return u ? { 'Authorization': `Bearer ${u.uid}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+  };
+  const getCart = () => JSON.parse(localStorage.getItem('centraa_cart') || '[]');
+  const saveCart = (cart) => { localStorage.setItem('centraa_cart', JSON.stringify(cart)); updateCartBadge(); };
+  const addToCart = (product, qty = 1) => {
+    let cart = getCart();
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) existing.qty += qty;
+    else cart.push({ ...product, qty });
+    saveCart(cart);
+  };
+  const updateCartBadge = () => {
+    const total = getCart().reduce((sum, i) => sum + i.qty, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  };
+
+  /* ============ LOCAL HELPERS ============ */
+  function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatPrice(n) {
+    const num = Number(n) || 0;
+    return 'Rs. ' + Math.round(num).toLocaleString('en-US');
+  }
+
+  function formatDate(iso) {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function renderStarsHtml(rating, size) {
+    const r = Math.round(Number(rating) || 0);
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += i <= r ? '&#9733;' : '<span class="empty">&#9733;</span>';
+    }
+    return html;
+  }
+
+  function getProductId(product) {
+    return product && (product.id || product._id);
+  }
+
+  const CATEGORY_ICONS = {
+    burgers: '&#127828;',
+    sandwiches: '&#129385;',
+    bread: '&#127859;',
+    'cold-drinks': '&#129380;'
+  };
+  function categoryIcon(category) {
+    if (!category) return '&#127860;';
+    const key = String(category).toLowerCase().replace(/\s+/g, '-');
+    return CATEGORY_ICONS[key] || '&#127860;';
+  }
+
+  function getWishlist() {
+    return JSON.parse(localStorage.getItem('centraa_wishlist') || '[]');
+  }
+  function saveWishlist(arr) {
+    localStorage.setItem('centraa_wishlist', JSON.stringify(arr));
+  }
+  function isWishlisted(id) {
+    return getWishlist().includes(id);
+  }
+  function toggleWishlist(id) {
+    let list = getWishlist();
+    if (list.includes(id)) {
+      list = list.filter(x => x !== id);
+    } else {
+      list.push(id);
+    }
+    saveWishlist(list);
+    return list.includes(id);
+  }
+
+  /* ============ STATE ============ */
+  let currentProduct = null;
+  let currentReviews = [];
+  let qty = 1;
+  let maxQty = 10;
+  let isAddingToCart = false;
+  let selectedRating = 0;
+  let images = [];
+  let activeImageIndex = 0;
+
+  /* ============ INIT ============ */
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
+  if (!productId) {
+    window.location.href = 'menu.html';
+    return;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateCartBadge();
+    setupAccountLink();
+    setupMobileNav();
+    setupTabs();
+    setupQtySelector();
+    setupAddToCartButton();
+    setupWishlistButton();
+    loadProduct();
+  });
+
+  function setupAccountLink() {
+    const user = getUser();
+    const accountText = document.getElementById('accountText');
+    if (user && accountText) {
+      accountText.textContent = `Hi, ${user.name ? user.name.split(' ')[0] : 'there'}`;
+    }
+  }
+
+  function setupMobileNav() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const closeBtn = document.getElementById('mobileNavClose');
+    const backdrop = document.getElementById('mobileBackdrop');
+
+    const open = () => { document.body.classList.add('menu-open'); hamburger.setAttribute('aria-expanded', 'true'); };
+    const close = () => { document.body.classList.remove('menu-open'); hamburger.setAttribute('aria-expanded', 'false'); };
+
+    hamburger.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+    document.querySelectorAll('.mobile-nav-links a').forEach(a => a.addEventListener('click', close));
+  }
+
+  /* ============ LOAD PRODUCT ============ */
+  async function loadProduct() {
+    document.body.classList.remove('state-loaded', 'state-error');
+    document.body.classList.add('state-loading');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/products/${productId}`);
+      if (!res.ok) throw new Error('Product not found');
+      const product = await res.json();
+
+      currentProduct = product;
+      renderProduct(product);
+
+      document.body.classList.remove('state-loading');
+      document.body.classList.add('state-loaded');
+
+      const pid = getProductId(product);
+      loadReviews(pid);
+      loadRelated(product.category, pid);
+    } catch (e) {
+      document.body.classList.remove('state-loading');
+      document.body.classList.add('state-error');
+    }
+  }
+
+  /* ============ RENDER PRODUCT ============ */
+  function renderProduct(product) {
+    document.title = `${product.name || 'Dish'} – Centraa`;
+
+    // Breadcrumb
+    document.getElementById('breadcrumbSkel').style.display = 'none';
+    const breadcrumbName = document.getElementById('breadcrumbName');
+    breadcrumbName.textContent = product.name || '';
+    breadcrumbName.style.display = 'inline';
+
+    // Gallery
+    images = Array.isArray(product.images) && product.images.length
+      ? product.images
+      : (product.imageUrl ? [product.imageUrl] : []);
+    activeImageIndex = 0;
+    renderMainImage();
+    renderThumbnails();
+
+    document.getElementById('categoryBadge').innerHTML = `${categoryIcon(product.category)} ${escapeHtml(product.category || '')}`;
+    document.getElementById('infoCategoryPill').innerHTML = `${categoryIcon(product.category)} ${escapeHtml(product.category || '')}`;
+
+    const wid = getProductId(product);
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    wishlistBtn.classList.toggle('active', isWishlisted(wid));
+
+    // Info
+    document.getElementById('productName').textContent = product.name || 'Untitled dish';
+    document.getElementById('productPrice').textContent = formatPrice(product.price);
+    document.getElementById('descriptionText').textContent = product.description && product.description.trim()
+      ? product.description
+      : 'No description available for this item.';
+
+    if (Array.isArray(product.ingredients) && product.ingredients.length) {
+      const tagWrap = document.getElementById('ingredientTags');
+      tagWrap.innerHTML = product.ingredients.map(ing => `<span class="ingredient-tag">${escapeHtml(ing)}</span>`).join('');
+      tagWrap.style.display = 'flex';
+    }
+
+    // Stock
+    const stockEl = document.getElementById('stockStatus');
+    const inStock = product.available !== false && Number(product.stock) > 0;
+    if (inStock) {
+      const left = Number(product.stock);
+      stockEl.className = 'stock-status in-stock';
+      stockEl.innerHTML = `&#9989; In Stock ${left < 10 ? `<span class="stock-left">(${left} left)</span>` : ''}`;
+      maxQty = Math.min(left, 10);
+    } else {
+      stockEl.className = 'stock-status out-stock';
+      stockEl.innerHTML = '&#10060; Out of Stock';
+      maxQty = 0;
+    }
+
+    qty = inStock ? 1 : 0;
+    updateQtyDisplay();
+    updateAddToCartAvailability(inStock);
+  }
+
+  function renderMainImage() {
+    const img = document.getElementById('mainImage');
+    const placeholder = document.getElementById('imagePlaceholder');
+    const src = images[activeImageIndex];
+
+    if (!src) {
+      img.style.display = 'none';
+      placeholder.classList.add('show');
+      return;
+    }
+
+    img.onerror = () => {
+      img.style.display = 'none';
+      placeholder.classList.add('show');
+    };
+    img.onload = () => {
+      img.style.display = 'block';
+      placeholder.classList.remove('show');
+    };
+
+    img.style.opacity = '0';
+    setTimeout(() => {
+      img.src = src;
+      img.alt = currentProduct ? currentProduct.name || '' : '';
+      img.style.opacity = '1';
+    }, 120);
+  }
+
+  function renderThumbnails() {
+    const strip = document.getElementById('thumbnailStrip');
+    if (images.length < 2) {
+      strip.style.display = 'none';
+      strip.innerHTML = '';
+      return;
+    }
+    strip.style.display = 'flex';
+    strip.innerHTML = images.map((src, i) =>
+      `<img src="${escapeHtml(src)}" data-index="${i}" class="${i === activeImageIndex ? 'active' : ''}" alt="View ${i + 1}">`
+    ).join('');
+    strip.querySelectorAll('img').forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        activeImageIndex = Number(thumb.dataset.index);
+        renderMainImage();
+        strip.querySelectorAll('img').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+    });
+  }
+
+  /* ============ WISHLIST ============ */
+  function setupWishlistButton() {
+    document.getElementById('wishlistBtn').addEventListener('click', () => {
+      if (!currentProduct) return;
+      const id = getProductId(currentProduct);
+      const active = toggleWishlist(id);
+      const btn = document.getElementById('wishlistBtn');
+      btn.classList.toggle('active', active);
+      btn.classList.remove('pulse');
+      requestAnimationFrame(() => btn.classList.add('pulse'));
+    });
+  }
+
+  /* ============ QUANTITY SELECTOR ============ */
+  function setupQtySelector() {
+    document.getElementById('qtyMinus').addEventListener('click', () => {
+      if (qty > 1) { qty--; updateQtyDisplay(); }
+    });
+    document.getElementById('qtyPlus').addEventListener('click', () => {
+      if (qty < maxQty) { qty++; updateQtyDisplay(); }
+    });
+  }
+  function updateQtyDisplay() {
+    const valEl = document.getElementById('qtyValue');
+    valEl.textContent = qty;
+    valEl.classList.remove('bump');
+    requestAnimationFrame(() => valEl.classList.add('bump'));
+    document.getElementById('qtyMinus').disabled = qty <= 1 || maxQty === 0;
+    document.getElementById('qtyPlus').disabled = qty >= maxQty || maxQty === 0;
+  }
+
+  /* ============ ADD TO CART ============ */
+  function updateAddToCartAvailability(inStock) {
+    const btn = document.getElementById('addToCartBtn');
+    const label = document.getElementById('addToCartLabel');
+    btn.disabled = !inStock;
+    label.textContent = inStock ? 'Add to Cart' : 'Out of Stock';
+  }
+
+  function setupAddToCartButton() {
+    document.getElementById('addToCartBtn').addEventListener('click', () => {
+      if (isAddingToCart || !currentProduct) return;
+      const btn = document.getElementById('addToCartBtn');
+      if (btn.disabled) return;
+
+      isAddingToCart = true;
+      btn.classList.add('is-loading');
+
+      setTimeout(() => {
+        addToCart({
+          id: getProductId(currentProduct),
+          name: currentProduct.name,
+          price: currentProduct.price,
+          image: currentProduct.imageUrl
+        }, qty);
+
+        btn.classList.remove('is-loading');
+        btn.classList.add('is-success');
+        document.getElementById('addToCartLabel').textContent = 'Added to Cart ✓';
+
+        const goToCartBtn = document.getElementById('goToCartBtn');
+        goToCartBtn.classList.add('visible');
+
+        setTimeout(() => {
+          btn.classList.remove('is-success');
+          document.getElementById('addToCartLabel').textContent = 'Add to Cart';
+          isAddingToCart = false;
+        }, 2000);
+      }, 500);
+    });
+  }
+
+  /* ============ TABS ============ */
+  function setupTabs() {
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        buttons.forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.tab-panel').forEach(p => {
+          p.classList.toggle('active', p.dataset.panel === target);
+        });
+      });
+    });
+  }
+
+  /* ============ REVIEWS ============ */
+  async function loadReviews(pid) {
+    try {
+      const res = await fetch(`${API_BASE}/api/reviews?productId=${encodeURIComponent(pid)}`);
+      let reviews = res.ok ? await res.json() : [];
+      if (!Array.isArray(reviews)) reviews = [];
+      // Defensive client-side filter in case the backend doesn't filter by productId.
+      reviews = reviews.filter(r => !r.productId || r.productId === pid);
+      currentReviews = reviews;
+    } catch (e) {
+      currentReviews = [];
+    }
+    renderReviews(currentReviews);
+  }
+
+  function renderReviews(reviews) {
+    const count = reviews.length;
+    document.getElementById('reviewCountLabel').textContent = `(${count})`;
+
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+    reviews.forEach(r => {
+      const star = Math.min(5, Math.max(1, Math.round(Number(r.rating) || 0)));
+      counts[star] = (counts[star] || 0) + 1;
+      sum += Number(r.rating) || 0;
+    });
+    const avg = count > 0 ? sum / count : 0;
+
+    document.getElementById('avgRatingNumber').textContent = avg.toFixed(1);
+    document.getElementById('summaryStars').innerHTML = renderStarsHtml(avg);
+    document.getElementById('summaryCount').textContent = count > 0 ? `Based on ${count} review${count === 1 ? '' : 's'}` : 'No reviews yet';
+
+    // Compact rating row next to price
+    const ratingStars = document.getElementById('ratingStars');
+    const ratingText = document.getElementById('ratingText');
+    if (count > 0) {
+      ratingStars.innerHTML = renderStarsHtml(avg);
+      ratingText.innerHTML = `<span class="rating-number">${avg.toFixed(1)}</span> &nbsp;(${count} review${count === 1 ? '' : 's'})`;
+    } else {
+      ratingStars.innerHTML = '';
+      ratingText.textContent = 'No reviews yet';
+    }
+
+    // Bars
+    const barsWrap = document.getElementById('summaryBars');
+    barsWrap.innerHTML = [5, 4, 3, 2, 1].map(star => {
+      const c = counts[star] || 0;
+      const pct = count > 0 ? Math.round((c / count) * 100) : 0;
+      return `
+        <div class="bar-row">
+          <span class="bar-label">${star}&#9733;</span>
+          <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
+          <span class="bar-count">${c}</span>
+        </div>`;
+    }).join('');
+
+    // List
+    const listEl = document.getElementById('reviewList');
+    if (count === 0) {
+      listEl.innerHTML = '<p class="no-reviews-msg">No reviews yet. Be the first to review this dish!</p>';
+    } else {
+      listEl.innerHTML = reviews.map(r => {
+        const initial = (r.userName || 'U').trim().charAt(0).toUpperCase() || 'U';
+        return `
+          <div class="review-card">
+            <div class="review-head">
+              <div class="review-avatar">${escapeHtml(initial)}</div>
+              <div>
+                <div class="review-name">${escapeHtml(r.userName || 'Anonymous')}</div>
+                <div class="review-date">${formatDate(r.createdAt)}</div>
+              </div>
+            </div>
+            <div class="review-stars">${renderStarsHtml(r.rating)}</div>
+            <p class="review-text">${escapeHtml(r.text || '')}</p>
+          </div>`;
+      }).join('');
+    }
+
+    renderWriteReviewSection();
+  }
+
+  function renderWriteReviewSection() {
+    const wrap = document.getElementById('writeReviewSection');
+    const user = getUser();
+
+    if (!user) {
+      wrap.innerHTML = `<p class="login-prompt"><a href="login.html">Login</a> to write a review.</p>`;
+      return;
+    }
+
+    selectedRating = 0;
+    wrap.innerHTML = `
+      <h3>Write a Review</h3>
+      <div class="star-picker" id="starPicker">
+        ${[1, 2, 3, 4, 5].map(i => `<span data-value="${i}">&#9733;</span>`).join('')}
+      </div>
+      <textarea class="review-textarea" id="reviewTextInput" placeholder="Share your experience..."></textarea>
+      <button class="btn-submit-review" id="submitReviewBtn">Submit Review</button>
+      <p class="form-message" id="reviewFormMessage"></p>
+    `;
+
+    const stars = wrap.querySelectorAll('.star-picker span');
+    stars.forEach(star => {
+      star.addEventListener('mouseenter', () => paintStars(stars, Number(star.dataset.value)));
+      star.addEventListener('mouseleave', () => paintStars(stars, selectedRating));
+      star.addEventListener('click', () => {
+        selectedRating = Number(star.dataset.value);
+        paintStars(stars, selectedRating);
+      });
+    });
+
+    document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
+  }
+
+  function paintStars(stars, upTo) {
+    stars.forEach(s => s.classList.toggle('filled', Number(s.dataset.value) <= upTo));
+  }
+
+  async function submitReview() {
+    const msgEl = document.getElementById('reviewFormMessage');
+    const textEl = document.getElementById('reviewTextInput');
+    const text = textEl ? textEl.value.trim() : '';
+
+    msgEl.classList.remove('show', 'success', 'error');
+
+    if (selectedRating < 1 || !text) {
+      msgEl.textContent = 'Please select a rating and write your review.';
+      msgEl.classList.add('show', 'error');
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitReviewBtn');
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/reviews`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          productId: getProductId(currentProduct),
+          productName: currentProduct.name,
+          rating: selectedRating,
+          text
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Could not submit your review.');
+      }
+
+      document.getElementById('writeReviewSection').innerHTML =
+        '<p class="form-message show success">Review submitted! It will appear after approval.</p>';
+    } catch (e) {
+      msgEl.textContent = e.message || 'Something went wrong. Please try again.';
+      msgEl.classList.add('show', 'error');
+      submitBtn.disabled = false;
+    }
+  }
+
+  /* ============ RELATED PRODUCTS ============ */
+  async function loadRelated(category, currentId) {
+    const section = document.getElementById('relatedSection');
+    try {
+      const res = await fetch(`${API_BASE}/api/products?category=${encodeURIComponent(category || '')}&available=true`);
+      const all = res.ok ? await res.json() : [];
+      const related = (Array.isArray(all) ? all : [])
+        .filter(p => getProductId(p) !== currentId)
+        .slice(0, 6);
+
+      if (related.length < 2) {
+        section.classList.add('hidden');
+        return;
+      }
+      renderRelated(related);
+    } catch (e) {
+      section.classList.add('hidden');
+    }
+  }
+
+  function renderRelated(related) {
+    const row = document.getElementById('relatedRow');
+    row.innerHTML = related.map((p, idx) => {
+      const pid = getProductId(p);
+      const img = p.imageUrl
+        ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.name || '')}" loading="lazy">`
+        : `<div style="height:140px;display:flex;align-items:center;justify-content:center;color:var(--gold);background:var(--bg-surface);font-size:28px;">&#127860;</div>`;
+      return `
+        <div class="related-card">
+          <a class="rc-image-link" href="product.html?id=${encodeURIComponent(pid)}">${img}</a>
+          <div class="rc-body">
+            <a href="product.html?id=${encodeURIComponent(pid)}"><div class="rc-name">${escapeHtml(p.name || '')}</div></a>
+            <div class="rc-price">${formatPrice(p.price)}</div>
+            <button data-index="${idx}">Add to Cart</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    row.querySelectorAll('button[data-index]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = related[Number(btn.dataset.index)];
+        addToCart({ id: getProductId(p), name: p.name, price: p.price, image: p.imageUrl }, 1);
+        btn.textContent = 'Added ✓';
+        btn.classList.add('added');
+        setTimeout(() => {
+          btn.textContent = 'Add to Cart';
+          btn.classList.remove('added');
+        }, 1300);
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

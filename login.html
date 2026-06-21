@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Centraa</title>
+<meta name="description" content="Sign in to your Centraa account.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-surface: #111111;
+    --bg-card: #181818;
+    --gold: #c9a84c;
+    --gold-light: #e0b96a;
+    --gold-dim: #c9a84c33;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-muted: #666666;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --border: #2a2a2a;
+    --radius: 10px;
+    --transition: all 0.25s ease;
+  }
+
+html, body { min-height: 100%; }
+
+  body {
+    background: var(--bg-primary);
+    background-image: radial-gradient(ellipse 80% 60% at 50% 40%,
+      rgba(201,168,76,0.05) 0%, transparent 70%);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+
+  ::selection { background: var(--gold-dim); color: var(--gold-light); }
+
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* ============ CARD ============ */
+  .login-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 440px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: cardIn 0.5s ease forwards;
+  }
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-6px); }
+    40%,80% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  /* ============ LOGO ============ */
+  .login-logo {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  .login-logo span { color: var(--gold); }
+  .logo-underline {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 8px auto 32px;
+  }
+
+  /* ============ HEADING ============ */
+  .login-heading {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-heading h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 28px;
+    color: var(--text-primary);
+  }
+  .login-heading p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  /* ============ FORM ============ */
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap svg.field-icon {
+    position: absolute;
+    left: 16px; top: 50%;
+    transform: translateY(-50%);
+    width: 17px; height: 17px;
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1.6;
+    pointer-events: none;
+  }
+  .input-wrap input {
+    width: 100%;
+    height: 52px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: inherit;
+    padding: 0 16px 0 44px;
+    transition: var(--transition);
+  }
+  .input-wrap input::placeholder { color: var(--text-muted); }
+  .input-wrap input:focus {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--gold-dim);
+  }
+  .input-wrap.has-toggle input { padding-right: 46px; }
+
+  .toggle-eye {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .toggle-eye:hover { color: var(--gold); }
+  .toggle-eye svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+  .toggle-eye .eye-off { display: none; }
+  .toggle-eye.is-visible .eye-on { display: none; }
+  .toggle-eye.is-visible .eye-off { display: block; }
+
+  .field-error {
+    display: none;
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  .forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: -8px 0 22px;
+  }
+ .forgot-link {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 500;
+  transition: var(--transition);
+  background: none;
+  border: none;
+  padding: 0;
+}
+  .forgot-link:hover { color: var(--gold-light); }
+
+  /* ============ FORGOT PASSWORD INLINE PANEL ============ */
+  .forgot-panel {
+    display: none;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    margin: -10px 0 22px;
+  }
+  .forgot-panel.show { display: block; }
+  .forgot-panel p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .forgot-row-inputs {
+    display: flex;
+    gap: 10px;
+  }
+  .forgot-row-inputs input {
+    flex: 1;
+    height: 44px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 0 14px;
+    transition: var(--transition);
+  }
+  .forgot-row-inputs input:focus { border-color: var(--gold); outline: none; }
+  .forgot-row-inputs button {
+    background: var(--gold);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0 18px;
+    white-space: nowrap;
+    transition: var(--transition);
+  }
+  .forgot-row-inputs button:hover:not(:disabled) { background: var(--gold-light); }
+  .forgot-row-inputs button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .forgot-msg {
+    font-size: 12px;
+    margin-top: 10px;
+    display: none;
+  }
+  .forgot-msg.success { color: var(--success); display: block; }
+  .forgot-msg.error { color: var(--danger); display: block; }
+
+  @media (max-width: 480px) {
+    .forgot-row-inputs { flex-direction: column; }
+  }
+
+  /* ============ GLOBAL ERROR ============ */
+  .global-error {
+    display: none;
+    background: rgba(231,76,60,0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 13px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+
+  /* ============ SUBMIT BUTTON ============ */
+  .btn-signin {
+    width: 100%;
+    height: 52px;
+    background: var(--gold);
+    color: #0a0a0a;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-signin:hover:not(:disabled) { background: var(--gold-light); }
+  .btn-signin:disabled { opacity: 0.75; cursor: not-allowed; }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(10,10,10,0.25);
+    border-top-color: #0a0a0a;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-signin.is-loading .spinner { display: inline-block; }
+  .btn-signin.is-loading .btn-label { display: none; }
+
+  /* ============ DIVIDER ============ */
+  .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+  .divider span:first-child,
+  .divider span:last-child { flex: 1; height: 1px; background: var(--border); }
+  .divider span:nth-child(2) { color: var(--text-muted); font-size: 13px; }
+
+  /* ============ REGISTER / BACK ============ */
+  .register-row {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .register-row a {
+    color: var(--gold);
+    font-weight: 700;
+    transition: var(--transition);
+  }
+  .register-row a:hover { color: var(--gold-light); }
+
+  .back-home {
+    text-align: center;
+    margin-top: 28px;
+  }
+  .back-home a {
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: var(--transition);
+  }
+  .back-home a:hover { color: var(--gold); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 480px) {
+    body { padding: 0; }
+    .login-card {
+      max-width: 100vw;
+      width: 100vw;
+      min-height: 100vh;
+      border-radius: 0;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+
+  @media (min-width: 481px) and (max-width: 600px) {
+    .login-card { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-card" id="loginCard">
+
+  <div class="login-logo">CENTR<span>AA</span></div>
+  <div class="logo-underline"></div>
+
+  
+
+<!-- STEP 1: LOGIN -->
+  <div id="step-login">
+    <div class="login-heading">
+      <h1>Welcome Back</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <div class="global-error" id="globalError"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M3 6.5l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field-error" id="emailError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap has-toggle">
+          <svg class="field-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password">
+          <button type="button" class="toggle-eye" id="toggleEye" aria-label="Show password">
+            <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.88 5.1A11 11 0 0 1 12 5c7 0 11 7 11 7a13.4 13.4 0 0 1-3.06 3.94M6.6 6.6A13.4 13.4 0 0 0 1 12s4 7 11 7a10.6 10.6 0 0 0 5.4-1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="passwordError"></div>
+      </div>
+
+      <div class="forgot-row">
+        <button type="button" class="forgot-link" id="forgotToggle">Forgot Password?</button>
+      </div>
+
+      <button type="submit" class="btn-signin" id="signInBtn">
+        <span class="btn-label">Sign In</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="divider"><span></span><span>or</span><span></span></div>
+
+    <div class="register-row">
+      Don't have an account? <a href="register.html">Create Account</a>
+    </div>
+  </div>
+
+  <!-- STEP 2: ENTER EMAIL FOR CODE -->
+  <div id="step-forgot" style="display:none;">
+    <div class="login-heading">
+      <h1>Reset Password</h1>
+      <p>Enter your email and we'll send you a code</p>
+    </div>
+
+    <div class="global-error" id="forgotGlobalError"></div>
+
+    <form id="forgotForm" novalidate>
+      <div class="form-group">
+        <label for="forgotEmail">Email Address</label>
+        <div class="input-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M3 6.5l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input type="email" id="forgotEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field-error" id="forgotEmailError"></div>
+      </div>
+
+      <button type="submit" class="btn-signin" id="sendCodeBtn">
+        <span class="btn-label">Send Code</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="back-home" style="margin-top:24px;">
+      <a href="#" id="backToLoginFromForgot">← Back to Login</a>
+    </div>
+  </div>
+
+  <!-- STEP 3: CODE + NEW PASSWORD -->
+  <div id="step-reset" style="display:none;">
+    <div class="login-heading">
+      <h1>Set New Password</h1>
+      <p>Enter the code sent to your email</p>
+    </div>
+
+    <div class="global-error" id="resetGlobalError"></div>
+
+    <form id="resetForm" novalidate>
+      <div class="form-group">
+        <label for="resetCode">Verification Code</label>
+        <div class="input-wrap">
+          <input type="text" id="resetCode" placeholder="6-digit code" maxlength="6" inputmode="numeric" style="padding-left:16px;">
+        </div>
+        <div class="field-error" id="resetCodeError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <div class="input-wrap has-toggle">
+          <svg class="field-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input type="password" id="newPassword" placeholder="Enter new password" autocomplete="new-password">
+          <button type="button" class="toggle-eye" id="toggleNewPw" aria-label="Show password">
+            <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.88 5.1A11 11 0 0 1 12 5c7 0 11 7 11 7a13.4 13.4 0 0 1-3.06 3.94M6.6 6.6A13.4 13.4 0 0 0 1 12s4 7 11 7a10.6 10.6 0 0 0 5.4-1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="newPasswordError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmNewPassword">Re-enter New Password</label>
+        <div class="input-wrap has-toggle">
+          <svg class="field-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input type="password" id="confirmNewPassword" placeholder="Re-enter new password" autocomplete="new-password">
+          <button type="button" class="toggle-eye" id="toggleConfirmPw" aria-label="Show password">
+            <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.88 5.1A11 11 0 0 1 12 5c7 0 11 7 11 7a13.4 13.4 0 0 1-3.06 3.94M6.6 6.6A13.4 13.4 0 0 0 1 12s4 7 11 7a10.6 10.6 0 0 0 5.4-1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="confirmNewPasswordError"></div>
+      </div>
+
+      <button type="submit" class="btn-signin" id="resetPasswordBtn">
+        <span class="btn-label">Reset Password</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="back-home" style="margin-top:24px;">
+      <a href="#" id="backToLoginFromReset">← Back to Login</a>
+    </div>
+  </div>
+
+  <div class="back-home" id="backHomeDefault">
+    <a href="index.html">← Back to Home</a>
+  </div>
+
+</div>
+
+<script>
+  // ============ GLOBAL HELPERS ============
+  const API_BASE = 'https://centraa-backend.vercel.app';
+  const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
+  const updateCartBadge = () => {
+    const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
+    document.querySelectorAll('.cart-badge').forEach(el => {
+      el.textContent = total;
+      el.style.display = total > 0 ? 'flex' : 'none';
+    });
+  };
+
+  // ============ AUTH GUARD ============
+  (function authGuard() {
+    const user = getUser();
+    if (user) {
+      window.location.href = 'index.html';
+    }
+  })();
+
+  const params = new URLSearchParams(window.location.search);
+  const redirectTo = params.get('redirect') || 'index.html';
+
+  // ============ ELEMENT REFS ============
+  const loginForm = document.getElementById('loginForm');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const emailError = document.getElementById('emailError');
+  const passwordError = document.getElementById('passwordError');
+  const globalErrorEl = document.getElementById('globalError');
+  const signInBtn = document.getElementById('signInBtn');
+  const toggleEye = document.getElementById('toggleEye');
+
+  // ============ PASSWORD VISIBILITY ============
+  toggleEye.addEventListener('click', () => {
+    const isVisible = passwordInput.type === 'text';
+    passwordInput.type = isVisible ? 'password' : 'text';
+    toggleEye.classList.toggle('is-visible', !isVisible);
+    toggleEye.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+  });
+// ============ STEP SWITCHING ============
+// ============ STEP SWITCHING ============
+  function showStep(step) {
+    document.getElementById('step-login').style.display = step === 'login' ? 'block' : 'none';
+    document.getElementById('step-forgot').style.display = step === 'forgot' ? 'block' : 'none';
+    document.getElementById('step-reset').style.display = step === 'reset' ? 'block' : 'none';
+    document.getElementById('backHomeDefault').style.display = step === 'login' ? 'block' : 'none';
+  }
+
+  document.getElementById('forgotToggle').addEventListener('click', () => {
+    document.getElementById('forgotEmail').value = emailInput.value || '';
+    showStep('forgot');
+  });
+
+  document.getElementById('backToLoginFromForgot').addEventListener('click', (e) => {
+    e.preventDefault();
+    showStep('login');
+  });
+
+  document.getElementById('backToLoginFromReset').addEventListener('click', (e) => {
+    e.preventDefault();
+    showStep('login');
+  });
+
+  // ============ EYE TOGGLES FOR NEW PASSWORD STEP ============
+  function wireEyeToggle(btnId, inputEl) {
+    const btn = document.getElementById(btnId);
+    btn.addEventListener('click', () => {
+      const isVisible = inputEl.type === 'text';
+      inputEl.type = isVisible ? 'password' : 'text';
+      btn.classList.toggle('is-visible', !isVisible);
+    });
+  }
+  wireEyeToggle('toggleNewPw', document.getElementById('newPassword'));
+  wireEyeToggle('toggleConfirmPw', document.getElementById('confirmNewPassword'));
+
+  // ============ STEP 2 → SEND CODE ============
+  let resetEmailValue = '';
+
+  document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+    const forgotEmailError = document.getElementById('forgotEmailError');
+    const forgotGlobalError = document.getElementById('forgotGlobalError');
+    const sendCodeBtn = document.getElementById('sendCodeBtn');
+
+    forgotEmailError.style.display = 'none';
+    forgotGlobalError.style.display = 'none';
+
+    if (!validateEmail(email)) {
+      forgotEmailError.textContent = 'Enter a valid email address';
+      forgotEmailError.style.display = 'block';
+      return;
+    }
+
+    sendCodeBtn.disabled = true;
+    sendCodeBtn.classList.add('is-loading');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 404) {
+        forgotGlobalError.textContent = 'No account found with this email.';
+        forgotGlobalError.style.display = 'block';
+        return;
+      }
+      if (!res.ok) {
+        forgotGlobalError.textContent = data.error || 'Something went wrong. Please try again.';
+        forgotGlobalError.style.display = 'block';
+        return;
+      }
+
+      resetEmailValue = email;
+      showStep('reset');
+
+    } catch (err) {
+      forgotGlobalError.textContent = 'Network error. Please check your connection.';
+      forgotGlobalError.style.display = 'block';
+    } finally {
+      sendCodeBtn.disabled = false;
+      sendCodeBtn.classList.remove('is-loading');
+    }
+  });
+
+  // ============ STEP 3 → RESET PASSWORD ============
+  document.getElementById('resetForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const code = document.getElementById('resetCode').value.trim();
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+    const resetCodeError = document.getElementById('resetCodeError');
+    const newPasswordError = document.getElementById('newPasswordError');
+    const confirmNewPasswordError = document.getElementById('confirmNewPasswordError');
+    const resetGlobalError = document.getElementById('resetGlobalError');
+    const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+
+    [resetCodeError, newPasswordError, confirmNewPasswordError, resetGlobalError].forEach(el => el.style.display = 'none');
+
+    let valid = true;
+    if (!/^[0-9]{6}$/.test(code)) {
+      resetCodeError.textContent = 'Enter the 6-digit code';
+      resetCodeError.style.display = 'block';
+      valid = false;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      newPasswordError.textContent = 'Password must be at least 6 characters';
+      newPasswordError.style.display = 'block';
+      valid = false;
+    }
+    if (confirmNewPassword !== newPassword) {
+      confirmNewPasswordError.textContent = 'Passwords do not match';
+      confirmNewPasswordError.style.display = 'block';
+      valid = false;
+    }
+    if (!valid) return;
+
+    resetPasswordBtn.disabled = true;
+    resetPasswordBtn.classList.add('is-loading');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmailValue, code, newPassword })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        resetGlobalError.textContent = data.error || 'Invalid or expired code.';
+        resetGlobalError.style.display = 'block';
+        return;
+      }
+
+      showStep('login');
+      showGlobalError('Password reset successfully. Please sign in with your new password.');
+
+    } catch (err) {
+      resetGlobalError.textContent = 'Network error. Please check your connection.';
+      resetGlobalError.style.display = 'block';
+    } finally {
+      resetPasswordBtn.disabled = false;
+      resetPasswordBtn.classList.remove('is-loading');
+    }
+  });
+  // ============ LOGIN ============
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function showFieldError(input, msg) {
+    input.style.borderColor = 'var(--danger)';
+    const err = input.closest('.form-group').querySelector('.field-error');
+    if (err) { err.textContent = msg; err.style.display = 'block'; }
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 400);
+  }
+
+  function clearErrors() {
+    [emailInput, passwordInput].forEach(input => {
+      input.style.borderColor = '';
+    });
+    emailError.style.display = 'none';
+    passwordError.style.display = 'none';
+    globalErrorEl.style.display = 'none';
+  }
+
+  function showGlobalError(msg) {
+    globalErrorEl.textContent = msg;
+    globalErrorEl.style.display = 'block';
+  }
+
+  function shakeCard() {
+    const card = document.getElementById('loginCard');
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+  }
+
+  function setLoading(state) {
+    signInBtn.disabled = state;
+    signInBtn.classList.toggle('is-loading', state);
+  }
+
+  loginForm.addEventListener('submit', handleLogin);
+
+  [emailInput, passwordInput].forEach(input => {
+    input.addEventListener('input', () => {
+      input.style.borderColor = '';
+      input.closest('.form-group').querySelector('.field-error').style.display = 'none';
+    });
+  });
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+
+    if (!email || !validateEmail(email)) {
+      showFieldError(emailInput, 'Enter a valid email address');
+      return;
+    }
+    if (!password || password.length < 6) {
+      showFieldError(passwordInput, 'Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    clearErrors();
+
+    try {
+     const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+if (!res.ok) {
+        if (res.status === 403 && data.needsVerification) {
+          showGlobalError('Please verify your email before logging in — check your inbox for the code.');
+        } else if (res.status === 403) {
+          showGlobalError('Your account has been blocked. Please contact support.');
+        } else if (res.status === 401) {
+          showGlobalError('Incorrect email or password. Please try again.');
+          shakeCard();
+        } else {
+          showGlobalError(data.error || 'Login failed. Please try again.');
+        }
+        return;
+      }
+
+      localStorage.setItem('centraa_token', data.token);
+      localStorage.setItem('centraa_user', JSON.stringify(data.user));
+
+      window.location.href = redirectTo;
+
+    } catch (err) {
+      showGlobalError('Network error. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  }
+</script>
+
+</body>
+</html>
