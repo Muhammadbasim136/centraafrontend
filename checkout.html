@@ -1289,6 +1289,7 @@
       const res = await fetch(`${API_BASE}/api/vouchers/validate`, {
         method: 'POST',
         headers: authHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ code, orderTotal: subtotal, userId: user ? user.uid : null })
       });
 
@@ -1343,6 +1344,7 @@
       const res = await fetch(`${API_BASE}/api/vouchers/validate`, {
         method: 'POST',
         headers: authHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ code: promo.code, orderTotal: subtotal, userId: user ? user.uid : null })
       });
       const data = await res.json().catch(() => ({}));
@@ -1521,6 +1523,7 @@
       const res = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: authHeaders(),
+        credentials: 'include',
         body: JSON.stringify(payload)
       });
 
