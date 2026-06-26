@@ -205,12 +205,40 @@
   }
 
   /* ============ HERO ============ */
-  .hero {
-    padding: 120px 0;
-    text-align: center;
-    background: radial-gradient(ellipse 60% 40% at 50% 50%,
-      rgba(201,168,76,0.06) 0%, transparent 70%);
-  }
+.hero {
+  padding: 140px 0 120px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0a;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+}
+.hero > .container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.hero-bg.loaded { opacity: 1; }
+.hero-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(0,0,0,0.78) 0%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.40) 100%
+  );
+}
+.hero > .container { position: relative; z-index: 1; }
 
   .hero-eyebrow {
     display: flex;
@@ -747,7 +775,7 @@
 <!-- ============ NAVBAR ============ -->
 <nav class="navbar">
   <div class="container nav-inner">
-    <a href="index.html" class="nav-logo">Centra<span>a</span></a>
+    <a href="index.html" class="nav-logo">Centr<span>aa</span></a>
 
     <div class="nav-links">
       <a href="index.html">Home</a>
@@ -757,7 +785,7 @@
     </div>
 
     <div class="nav-actions">
-      <a href="account.html" class="nav-icon-btn" aria-label="Account">👤</a>
+      <div id="navUserBtn"></div>
       <a href="cart.html" class="nav-icon-btn" aria-label="Cart">
         🛒
         <span class="cart-badge">0</span>
@@ -772,8 +800,9 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero">
-  <div class="container reveal">
-    <div class="hero-eyebrow">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-bg-overlay"></div>
+  <div class="container reveal">    <div class="hero-eyebrow">
       <span class="gold-line"></span>
       <span class="hero-label">About Us</span>
       <span class="gold-line"></span>
@@ -965,7 +994,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-about">
-        <div class="footer-logo">Centra<span>a</span></div>
+        <div class="footer-logo">Centr<span>aa</span></div>
         <p>Karachi's finest dining experience — bold Pakistani flavours, served with refined modern hospitality.</p>
         <div class="footer-socials">
           <a href="#" aria-label="Instagram">📷</a>
@@ -1027,6 +1056,45 @@
     });
   };
   updateCartBadge();
+
+// ============ NAVBAR USER STATE ============
+  (function renderNavUser() {
+    const user = getUser();
+    const el = document.getElementById('navUserBtn');
+    if (!el) return;
+    if (user) {
+      el.innerHTML = `<a href="profile.html" style="
+        width:40px;height:40px;border-radius:50%;
+        background:var(--gold-dim);color:var(--gold);
+        display:flex;align-items:center;justify-content:center;
+        font-family:'Playfair Display',serif;font-weight:700;font-size:15px;
+        border:1px solid var(--gold);text-decoration:none;
+      ">${(user.name||'U')[0].toUpperCase()}</a>`;
+    } else {
+      el.innerHTML = `<a href="login.html" style="
+        background:var(--gold);color:#0a0a0a;font-size:13px;
+        font-weight:600;padding:10px 20px;border-radius:30px;
+        text-decoration:none;transition:all 0.25s ease;
+      ">Login</a>`;
+    }
+  })();
+
+  // ── Banner background on hero ──
+  (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/banners`);
+      if (!res.ok) throw new Error();
+      const banners = await res.json();
+      const active = Array.isArray(banners) && banners.find(b => b.active !== false && b.imageUrl);
+      if (active) {
+        const bg = document.getElementById('heroBg');
+        bg.style.backgroundImage = `url('${active.imageUrl}')`;
+        const img = new Image();
+        img.onload = () => bg.classList.add('loaded');
+        img.src = active.imageUrl;
+      }
+    } catch { /* keep dark bg */ }
+  })();
 
   // reflect logged-in state on the account icon (optional nicety)
   (function reflectUser() {

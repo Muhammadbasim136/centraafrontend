@@ -1531,7 +1531,7 @@
       // Success
       localStorage.removeItem('centraa_cart');
       clearPromo();
-      window.location.href = `order-confirmed.html?orderId=${data.orderId}`;
+      window.location.href = `order-confirmed.html?orderId=${data.id}`;
 
     } catch (e) {
       showOrderError(e.message);

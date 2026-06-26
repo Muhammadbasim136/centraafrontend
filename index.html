@@ -377,15 +377,19 @@
     }
 
     /* ─── HERO ───────────────────────────────────────────── */
-    #hero {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      min-height: 520px;
-      max-height: 860px;
-      overflow: hidden;
-      background: var(--bg);
-    }
+#hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 520px;
+  max-height: 860px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+
+
+
 
     /* skeleton */
     .hero-skel {
@@ -419,15 +423,15 @@
     }
     .slide.active .slide-bg { transform: scale(1); }
     .slide-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        105deg,
-        rgba(0,0,0,.72) 0%,
-        rgba(0,0,0,.38) 55%,
-        rgba(0,0,0,.18) 100%
-      );
-    }
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(0,0,0,.82) 0%,
+    rgba(0,0,0,.55) 50%,
+    rgba(0,0,0,.35) 100%
+  );
+}
     .slide-content {
       position: absolute;
       inset: 0;
@@ -544,10 +548,39 @@
     .hero-fallback .slide-title { color: #fff; margin-bottom: 14px; }
     .hero-fallback .slide-sub { margin-bottom: 32px; }
 
-    @media (max-width: 640px) {
-      .slide-content, .hero-skel, .hero-fallback { padding: 0 24px 20vh; }
-      .hero-arrow { display: none; }
-    }
+@media (max-width: 640px) {
+  .hero-arrow { display: none; }
+  #hero {
+    height: 56vw;
+    min-height: 200px;
+    max-height: 320px;
+  }
+  .slide-content {
+    padding: 0 16px 14px;
+    justify-content: flex-end;
+  }
+  .hero-skel { padding: 0 16px 14px; }
+  .hero-fallback { padding: 0 16px 14px; }
+  .slide-title { font-size: clamp(20px, 5.5vw, 28px); margin-bottom: 6px; }
+  .slide-sub { font-size: 12px; margin-bottom: 12px; max-width: 100%; }
+  .btn-hero { height: 36px; padding: 0 16px; font-size: 11px; }
+  .slide-eyebrow { font-size: 9px; margin-bottom: 6px; }
+}
+
+
+@media (max-width: 640px) {
+  #featured { padding: 28px 0; }
+  #about { padding: 32px 0; }
+  #reviews { padding: 28px 0; }
+  #categories { padding: 12px 0; }
+  .featured-head { margin-bottom: 18px; }
+  .reviews-head { margin-bottom: 18px; }
+  .about-grid { gap: 20px; }
+  .view-menu-link { margin-top: 20px; }
+  footer { padding: 36px 0 0; }
+  .footer-grid { gap: 28px; }
+  .footer-bottom { margin-top: 28px; }
+}
 
     /* ─── CATEGORY STRIP ─────────────────────────────────── */
     #categories {
@@ -605,17 +638,16 @@
       gap: 20px;
     }
     @media (max-width: 1024px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 500px) {
-      .products-grid {
-        display: flex;
-        overflow-x: auto;
-        gap: 14px;
-        padding-bottom: 12px;
-        scrollbar-width: none;
-      }
-      .products-grid::-webkit-scrollbar { display: none; }
-      .product-card { min-width: 240px; flex-shrink: 0; }
-    }
+   @media (max-width: 500px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .product-img-wrap { height: 140px; }
+  .product-name { font-size: 13px; }
+  .product-price { font-size: 14px; }
+  .btn-add { height: 38px; font-size: 12px; }
+}
 
     .product-card {
       background: var(--surface);
@@ -987,6 +1019,9 @@
     }
     .footer-admin:hover { opacity: .9; }
 
+
+
+
     /* ─── TOAST ──────────────────────────────────────────── */
     #toast-root {
       position: fixed;
@@ -1013,7 +1048,13 @@
     .toast.out { animation: toastOut .3s var(--ease) forwards; }
     @keyframes toastIn  { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
     @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateX(20px); } }
-  </style>
+
+/* LOGO COLOR FOR CENTRAA */
+.centraa{
+  color: white;
+}
+
+</style>
 </head>
 <body>
 
@@ -1024,7 +1065,7 @@
   <div class="nav-inner">
 
     <!-- Logo -->
-    <a href="index.html" class="nav-logo" aria-label="Centraa home">Centraa</a>
+    <a href="index.html" class="nav-logo" aria-label="Centraa home"><span class="centraa">Centr</span>aa</a>
 
     <!-- Center links (desktop) -->
     <nav class="nav-links" aria-label="Primary navigation">
@@ -1061,6 +1102,10 @@
           </svg>
         </button>
         <div class="user-dropdown" id="user-dropdown" role="menu">
+          <a href="profile.html" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+            Profile
+          </a>
           <a href="orders.html" role="menuitem">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
             My Orders
@@ -1096,6 +1141,7 @@
       <a href="login.html">Sign In</a>
     </div>
     <div id="mobile-auth-user" style="display:none">
+      <a href="profile.html">Profile</a>
       <a href="orders.html">My Orders</a>
       <button class="mobile-logout logout-btn">Logout</button>
     </div>
@@ -1272,7 +1318,7 @@
     <div class="footer-grid">
       <!-- Brand -->
       <div class="footer-brand">
-        <a href="index.html" class="footer-logo">Centraa</a>
+        <a href="index.html" class="footer-logo"><span class="centraa">Centr</span>aa</a>
         <p class="footer-tagline">Dine. Delight. Repeat.</p>
         <div class="footer-socials">
           <a href="#" class="footer-social" aria-label="Instagram" rel="noopener noreferrer">
@@ -1471,8 +1517,9 @@
   }
 
   // Logout
-  const doLogout = () => {
+const doLogout = () => {
     localStorage.removeItem('centraa_user');
+    localStorage.removeItem('centraa_token');
     localStorage.removeItem('centraa_cart');
     showToast('Logged out. See you soon!');
     setTimeout(() => location.reload(), 800);
@@ -1515,15 +1562,22 @@
     }
 
     render(banners) {
-      this.slides = banners;
-      this.skelEl.style.display = 'none';
+  this.slides = banners;
 
-      if (!banners.length) {
-        this.fallback.style.display = 'block';
-        return;
-      }
+  if (!banners.length) {
+    this.skelEl.style.display = 'none';
+    this.fallback.style.display = 'block';
+    return;
+  }
 
-      this.sliderWrap.style.display = 'block';
+  // Show slider first so images actually load
+  this.sliderWrap.style.display = 'block';
+
+// Hide arrows and dots if only 1 banner
+const showControls = banners.length > 1;
+      document.getElementById('hero-prev').style.display = showControls ? 'flex' : 'none';
+      document.getElementById('hero-next').style.display = showControls ? 'flex' : 'none';
+      this.dotsEl.style.display = showControls ? 'flex' : 'none';
       this.track.innerHTML = '';
       this.dotsEl.innerHTML = '';
 
@@ -1534,10 +1588,24 @@
         slide.setAttribute('role', 'tabpanel');
         slide.setAttribute('aria-label', `Slide ${i + 1}: ${esc(b.title)}`);
 
-        const bg = document.createElement('div');
-        bg.className = 'slide-bg';
-        if (b.imageUrl) bg.style.backgroundImage = `url('${esc(b.imageUrl)}')`;
-        else bg.style.background = '#1a1a1a';
+const bg = document.createElement('div');
+bg.className = 'slide-bg';
+if (b.imageUrl) {
+  // Preload image before showing skeleton removal
+  const preloader = new Image();
+  preloader.onload = () => {
+    bg.style.backgroundImage = `url('${esc(b.imageUrl)}')`;
+    if (i === 0) this.skelEl.style.display = 'none';
+  };
+  preloader.onerror = () => {
+     bg.style.background = '#1a1a1a';
+     if (i === 0) this.skelEl.style.display = 'none';
+     };
+     preloader.src = b.imageUrl;
+      } else {
+           bg.style.background = '#1a1a1a';
+            if (i === 0) this.skelEl.style.display = 'none';
+}
 
         const overlay = document.createElement('div');
         overlay.className = 'slide-overlay';
@@ -1545,18 +1613,27 @@
 
         const content = document.createElement('div');
         content.className = 'slide-content';
-        content.innerHTML = `
-          <p class="slide-eyebrow">Centraa — Est. 2024</p>
-          <h${i === 0 ? '1' : '2'} class="slide-title">${esc(b.title || '')}</h${i === 0 ? '1' : '2'}>
-          ${b.subtitle ? `<p class="slide-sub">${esc(b.subtitle)}</p>` : ''}
-          ${b.buttonText && b.buttonLink ? `
-            <a href="${esc(b.buttonLink)}" class="btn-hero">
-              ${esc(b.buttonText)}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </a>` : ''}
-        `;
+ const showTitle = b.title || (i === 0 ? 'Taste the<br>Extraordinary' : '');
+const showSub   = b.subtitle || (i === 0 ? 'Premium dining experience crafted for those who expect nothing less than the best.' : '');
+
+content.innerHTML = `
+  ${showTitle ? `<p class="slide-eyebrow">${i === 0 ? "Karachi's Finest" : (b.eyebrow || '')}</p>
+  <h${i === 0 ? '1' : '2'} class="slide-title">${showTitle}</h${i === 0 ? '1' : '2'}>` : ''}
+  ${showSub ? `<p class="slide-sub">${esc(showSub)}</p>` : ''}
+  ${b.buttonText && b.buttonLink ? `
+    <a href="${esc(b.buttonLink)}" class="btn-hero">
+      ${esc(b.buttonText)}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>` : i === 0 ? `
+    <a href="menu.html" class="btn-hero">
+      Explore Menu
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>` : ''}
+`;
 
         slide.append(bg, overlay, content);
         this.track.appendChild(slide);
@@ -1593,10 +1670,10 @@
     }
 
     startTimer() {
-      this.timer = setInterval(() => {
-        if (!this.paused) this.go(this.current + 1);
-      }, 4000);
-    }
+     const ms = (this.slides[0]?.intervalMs) || 4000;
+     this.timer = setInterval(() => {
+      if (!this.paused && this.slides.length > 1) this.go(this.current + 1);
+       }, ms);}
 
     resetTimer() {
       clearInterval(this.timer);
@@ -1687,13 +1764,13 @@
         <div class="product-body">
           <h3 class="product-name">${esc(p.name)}</h3>
           <p class="product-price"><span class="currency">Rs. </span>${price}</p>
-          ${!oos ? `<button class="btn-add" data-id="${esc(p._id)}" aria-label="Add ${esc(p.name)} to cart">Add to Cart</button>` : ''}
+          ${!oos ? `  <button class="btn-add" data-id="${esc(p.id)}" aria-label="Add ${esc(p.name)} to cart">Add to Cart</button>` : ''}
         </div>
       `;
 
       if (!oos) {
         card.querySelector('.btn-add').addEventListener('click', function () {
-          addToCart({ id: p._id, name: p.name, price: p.price, image: p.imageUrl || '' });
+          addToCart({ id: p.id, name: p.name, price: p.price, image: p.imageUrl || '' });
           this.textContent = 'Added ✓';
           this.classList.add('added');
           showToast(`${p.name} added to cart`);

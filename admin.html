@@ -612,6 +612,11 @@
     }
     .usage-text { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
 
+/* LOGO COLOR FOR CENTRAA */
+.centraa{
+  color: white;
+}
+
   </style>
 </head>
 <body>
@@ -619,7 +624,7 @@
 <!-- ══════════════════ AUTH GATE ══════════════════ -->
 <div id="authGate">
   <div class="auth-card">
-    <div class="auth-logo">CENTRAA</div>
+    <div class="auth-logo">CENTR<span class="centraa">AA</span></div>
     <div class="auth-sub">Admin Panel</div>
     <div class="auth-global-err" id="authGlobalErr"></div>
     <div class="auth-field">
@@ -735,7 +740,7 @@
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
             <option value="preparing">Preparing</option>
-            <option value="ready">Ready</option>
+            <option value="out_for_delivery">Out for Delivery</option>
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
           </select>
@@ -798,14 +803,14 @@
                   <th>Name</th>
                   <th>Category</th>
                   <th>Price</th>
-                  <th>Available</th>
-                  <th>Featured</th>
-                  <th>Actions</th>
+                 <th>In Stock</th>
+                 <th>Available</th>
+                 <th>Featured</th>
+<th>Actions</th>
                 </tr>
               </thead>
               <tbody id="productsTableBody">
-                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">Loading products…</td></tr>
-              </tbody>
+<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem;">Loading products…</td></tr>              </tbody>
             </table>
           </div>
         </div>
@@ -852,6 +857,27 @@
           <div class="section-title">Homepage Banners</div>
           <button class="btn btn-gold" onclick="openBannerModal()">＋ Add Banner</button>
         </div>
+<!-- Promo Strip -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <div class="card-body">
+    <div class="section-header" style="margin-bottom:1rem;">
+      <div class="section-title" style="font-size:0.95rem;">Homepage Promo Strip</div>
+      <label class="toggle" title="Toggle promo visibility">
+        <input type="checkbox" id="promoActiveToggle" onchange="togglePromoActive(this.checked)" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:flex-end;">
+      <div class="form-group" style="flex:1;margin:0;">
+        <label>Promo Text</label>
+        <input type="text" id="promoText" placeholder="e.g. 🎉 EID SPECIAL — 20% off · Use code: EID25" />
+      </div>
+      <button class="btn btn-gold" onclick="savePromo()" id="promoSaveBtn">Save</button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;">Use <strong>**bold text**</strong> for highlighted words. Leave empty to hide strip.</p>
+  </div>
+</div>
+
         <div class="banners-grid" id="bannersGrid">
           <div style="color:var(--text-muted);font-size:0.85rem;padding:1rem;">Loading banners…</div>
         </div>
@@ -1054,8 +1080,8 @@
         <input type="hidden" id="bannerImgUrl" />
       </div>
       <div class="form-group">
-        <label>Title *</label>
-        <input type="text" id="bTitle" placeholder="e.g. Eid Special Offer" />
+        <label>Title </label>
+        <input type="text" id="bTitle" placeholder="e.g. Eid Special Offer"  />
       </div>
       <div class="form-group">
         <label>Subtitle</label>
@@ -1069,7 +1095,11 @@
         <label>Order / Position</label>
         <input type="number" id="bOrder" placeholder="1" min="1" />
       </div>
-      <div class="form-group form-full">
+<div class="form-group">
+        <label>Slide Duration (seconds)</label>
+        <input type="number" id="bInterval" placeholder="4" min="2" max="30" value="4" />
+      </div>
+     <div class="form-group form-full">
         <label>Active</label>
         <div class="toggle-wrap" style="margin-top:0.4rem;">
           <label class="toggle"><input type="checkbox" id="bActive" checked /><span class="toggle-slider"></span></label>
@@ -1170,6 +1200,10 @@
      JAVASCRIPT
 ══════════════════════════════════════════════════════════════════ -->
 <script>
+
+
+window.deleteProduct = deleteProduct;
+
 /* ─────────────────────────────────────────────────────────────────
    CONFIG
 ───────────────────────────────────────────────────────────────── */
@@ -1247,7 +1281,7 @@ async function handleAdminLogin() {
   btn.textContent = 'Signing in…';
 
   try {
-    const res = await fetch(`${API}/api/users/login`, {
+const res = await fetch(`${API}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password: pass })
@@ -1260,14 +1294,11 @@ async function handleAdminLogin() {
       showAuthError(msg); return;
     }
 
-    if (data.role !== 'admin') {
-      showAuthError('Access denied — admin accounts only.'); return;
-    }
-
-    adminUser = data;
-    localStorage.setItem('centraa_admin', JSON.stringify(data));
+    adminUser = data.user;
+    localStorage.setItem('centraa_admin_token', data.token);
+    localStorage.setItem('centraa_admin', JSON.stringify(data.user));
     // Also set centraa_user so site pages work
-    localStorage.setItem('centraa_user', JSON.stringify(data));
+    localStorage.setItem('centraa_user', JSON.stringify(data.user));
     showApp();
 
   } catch (err) {
@@ -1307,6 +1338,7 @@ function showApp() {
 
 function handleLogout() {
   localStorage.removeItem('centraa_admin');
+  localStorage.removeItem('centraa_admin_token');
   location.reload();
 }
 
@@ -1360,9 +1392,9 @@ function toggleSidebar() {
 ═══════════════════════════════════════════════════════════════════ */
 async function loadDashboard() {
   try {
-    const [ordersRes, usersRes, productsRes] = await Promise.all([
-      fetch(`${API}/api/orders`, { headers: adminHeaders() }),
-      fetch(`${API}/api/users`,  { headers: adminHeaders() }),
+   const [ordersRes, usersRes, productsRes] = await Promise.all([
+      fetch(`${API}/api/orders/admin/all`, { headers: adminHeaders() }),
+      fetch(`${API}/api/users/admin/all`,  { headers: adminHeaders() }),
       fetch(`${API}/api/products`)
     ]);
 
@@ -1385,8 +1417,7 @@ async function loadDashboard() {
     `;
 
     // Recent 5 orders
-    const recent = [...orders].sort((a,b) => (b.createdAt||0) - (a.createdAt||0)).slice(0,5);
-    const tbody = document.querySelector('#dashRecentOrders tbody');
+const recent = [...orders].sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0)).slice(0,5);    const tbody = document.querySelector('#dashRecentOrders tbody');
     tbody.innerHTML = recent.length ? recent.map(o => `
       <tr class="recent-order-row">
         <td>#${(o.id||'').slice(-6).toUpperCase()}</td>
@@ -1421,7 +1452,7 @@ async function loadDashboard() {
 ═══════════════════════════════════════════════════════════════════ */
 async function loadOrders() {
   try {
-    const res = await fetch(`${API}/api/orders`, { headers: adminHeaders() });
+const res = await fetch(`${API}/api/orders/admin/all`, { headers: adminHeaders() });
     allOrders = res.ok ? await res.json() : [];
     renderOrders(allOrders);
   } catch (err) {
@@ -1436,8 +1467,8 @@ function renderOrders(orders) {
     tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="e-icon">📦</div><h4>No orders found</h4><p>Adjust filters or wait for new orders</p></div></td></tr>`;
     return;
   }
-  tbody.innerHTML = [...orders]
-    .sort((a,b) => (b.createdAt||0) - (a.createdAt||0))
+ tbody.innerHTML = [...orders]
+    .sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0))
     .map(o => `
     <tr>
       <td style="font-family:monospace;font-size:0.78rem;color:var(--gold);">#${(o.id||'').slice(-8).toUpperCase()}</td>
@@ -1532,22 +1563,28 @@ function renderProducts(products) {
       </td>
       <td><span style="font-size:0.8rem;color:var(--text-muted);">${esc(p.category||'—')}</span></td>
       <td style="font-weight:600;color:var(--gold);">Rs ${fmtNum(p.price||0)}</td>
+     <td>
+        <label class="toggle" title="Mark as out of stock">
+          <input type="checkbox" ${(p.stock===undefined||p.stock>0)?'checked':''} onchange="toggleProductStock('${p.id || p._id}',this.checked)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
       <td>
         <label class="toggle" title="Toggle availability">
-          <input type="checkbox" ${p.available!==false?'checked':''} onchange="toggleProductField('${p.id}','available',this.checked)" />
+          <input type="checkbox" ${p.available!==false?'checked':''} onchange="toggleProductField('${p.id || p._id}','available',this.checked)" />
           <span class="toggle-slider"></span>
         </label>
       </td>
       <td>
         <label class="toggle" title="Toggle featured">
-          <input type="checkbox" ${p.featured?'checked':''} onchange="toggleProductField('${p.id}','featured',this.checked)" />
+          <input type="checkbox" ${p.featured?'checked':''} onchange="toggleProductField('${p.id || p._id}','featured',this.checked)" />
           <span class="toggle-slider"></span>
         </label>
       </td>
       <td>
         <div style="display:flex;gap:0.4rem;">
-          <button class="btn btn-outline btn-sm" onclick="openProductModal('${p.id}')">✏️ Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}','${esc(p.name)}')">🗑️</button>
+          <button class="btn btn-outline btn-sm" onclick="openProductModal('${p.id || p._id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id || p._id}',this)">🗑️</button>
         </div>
       </td>
     </tr>`).join('');
@@ -1641,14 +1678,19 @@ async function submitProduct() {
       if (fileInput.files[0]) {
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
-        const uploadRes = await fetch(`${API}/api/upload`, {
+const uploadRes = await fetch(`${API}/api/upload`, {
           method: 'POST',
           headers: adminHeaders(),
           body: formData
         });
-        if (uploadRes.ok) {
+if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           imageUrl = uploadData.imageUrl || uploadData.url || '';
+        } else {
+          showToast('Image upload failed — max 500kb, JPEG/PNG/WEBP only', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Save Item';
+          return;
         }
       }
     }
@@ -1666,8 +1708,8 @@ async function submitProduct() {
       imageUrl
     };
 
-    const url    = editingProductId ? `${API}/api/products/${editingProductId}` : `${API}/api/products`;
-    const method = editingProductId ? 'PUT' : 'POST';
+   const url    = editingProductId ? `${API}/api/products/${editingProductId}` : `${API}/api/products`;
+    const method = editingProductId ? 'PATCH' : 'POST';
 
     const res = await fetch(url, {
       method,
@@ -1707,7 +1749,25 @@ async function toggleProductField(id, field, value) {
   }
 }
 
-function deleteProduct(id, name) {
+async function toggleProductStock(id, inStock) {
+  try {
+    const res = await fetch(`${API}/api/products/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', ...adminHeaders() },
+      body: JSON.stringify({ stock: inStock ? 999 : 0 })
+    });
+    if (!res.ok) throw new Error();
+    const p = allProducts.find(x => x.id === id);
+    if (p) p.stock = inStock ? 999 : 0;
+    showToast(inStock ? '✅ Marked as In Stock' : '🚫 Marked as Out of Stock', 'success');
+  } catch {
+    showToast('Update failed', 'error');
+    loadProducts();
+  }
+}
+
+function deleteProduct(id, btnEl) {
+  const name = allProducts.find(x => (x.id || x._id) === id)?.name || 'this item';
   openConfirm(
     '🗑️', `Delete "${name}"?`, 'This item will be removed from the menu permanently.',
     async () => {
@@ -1724,12 +1784,27 @@ function deleteProduct(id, name) {
   );
 }
 
+window.deleteProduct = deleteProduct;
+window.openProductModal = openProductModal;
+window.toggleProductStock = toggleProductStock;
+window.toggleProductField = toggleProductField;
+window.deleteBanner = deleteBanner;
+window.openBannerModal = openBannerModal;
+window.openOrderStatus = openOrderStatus;
+window.toggleUserBlock = toggleUserBlock;
+window.deleteUser = deleteUser;
+window.toggleReviewVisibility = toggleReviewVisibility;
+window.deleteReview = deleteReview;
+window.openVoucherModal = openVoucherModal;
+window.deleteVoucher = deleteVoucher;
+window.toggleVoucherActive = toggleVoucherActive;
+
 /* ═══════════════════════════════════════════════════════════════════
    TAB 4: USERS
 ═══════════════════════════════════════════════════════════════════ */
 async function loadUsers() {
   try {
-    const res = await fetch(`${API}/api/users`, { headers: adminHeaders() });
+    const res = await fetch(`${API}/api/users/admin/all`, { headers: adminHeaders() });
     allUsers = res.ok ? await res.json() : [];
     renderUsers(allUsers);
   } catch {
@@ -1755,9 +1830,12 @@ function renderUsers(users) {
       <td style="color:var(--text-muted);">${u.orderCount||0}</td>
       <td>
         ${u.role !== 'admin' ? `
-          <button class="btn btn-sm ${u.blocked?'btn-success':'btn-danger'}" onclick="toggleUserBlock('${u.id}',${!u.blocked},'${esc(u.name)}')">
-            ${u.blocked ? '✅ Unblock' : '🚫 Block'}
-          </button>` : '<span style="color:var(--text-dim);font-size:0.78rem;">—</span>'}
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button class="btn btn-sm ${u.blocked?'btn-success':'btn-danger'}" onclick="toggleUserBlock('${u.id}',${!u.blocked},'${esc(u.name)}')">
+              ${u.blocked ? '✅ Unblock' : '🚫 Block'}
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="deleteUser('${u.id}','${esc(u.name)}')">🗑️ Delete</button>
+          </div>` : '<span style="color:var(--text-dim);font-size:0.78rem;">—</span>'}
       </td>
     </tr>`).join('');
 }
@@ -1783,7 +1861,7 @@ function toggleUserBlock(userId, newBlocked, name) {
     newBlocked ? 'This user will not be able to log in.' : 'This user will regain access.',
     async () => {
       try {
-        const res = await fetch(`${API}/api/users/${userId}/block`, {
+        const res = await fetch(`${API}/api/users/admin/${userId}/block`, {
           method: 'PATCH',
           headers: { 'Content-Type':'application/json', ...adminHeaders() },
           body: JSON.stringify({ blocked: newBlocked })
@@ -1797,17 +1875,94 @@ function toggleUserBlock(userId, newBlocked, name) {
   );
 }
 
+function deleteUser(userId, name) {
+  openConfirm(
+    '🗑️',
+    `Delete "${name}"?`,
+    'This user will be removed permanently and will no longer be able to log in.',
+    async () => {
+      try {
+        const res = await fetch(`${API}/api/users/admin/${userId}`, {
+          method: 'DELETE',
+          headers: adminHeaders()
+        });
+        if (!res.ok) throw new Error();
+        closeModal('confirmModal');
+        showToast('User deleted ✅', 'success');
+        loadUsers();
+      } catch {
+        showToast('Could not delete user', 'error');
+      }
+    }
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    TAB 5: BANNERS
-═══════════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════════════════════════ */
 async function loadBanners() {
   try {
     const res = await fetch(`${API}/api/banners`, { headers: adminHeaders() });
     allBanners = res.ok ? await res.json() : [];
     renderBanners(allBanners);
+    loadPromo();
   } catch {
     document.getElementById('bannersGrid').innerHTML =
       `<p style="color:var(--danger);font-size:0.85rem;">Failed to load banners</p>`;
+  }
+}
+
+// ── PROMO STRIP ──────────────────────────────────────────────
+async function loadPromo() {
+  try {
+    const res = await fetch(`${API}/api/banners/promo/admin`, { headers: adminHeaders() });
+    const data = res.ok ? await res.json() : null;
+    if (data) {
+      document.getElementById('promoText').value = data.text || '';
+      document.getElementById('promoActiveToggle').checked = data.active !== false;
+    }
+  } catch { /* silent */ }
+}
+
+async function savePromo() {
+  const text = document.getElementById('promoText').value.trim();
+  const active = document.getElementById('promoActiveToggle').checked;
+  const btn = document.getElementById('promoSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const res = await fetch(`${API}/api/banners/promo`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ text, active })
+    });
+    if (res.status === 404) {
+      // No promo exists yet — create one
+      await fetch(`${API}/api/banners/promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ text, active })
+      });
+    }
+    showToast('Promo strip updated ✅', 'success');
+  } catch {
+    showToast('Could not save promo', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save';
+  }
+}
+
+async function togglePromoActive(value) {
+  try {
+    await fetch(`${API}/api/banners/promo`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+      body: JSON.stringify({ active: value })
+    });
+    showToast(value ? 'Promo strip shown ✅' : 'Promo strip hidden', 'success');
+  } catch {
+    showToast('Could not update promo', 'error');
   }
 }
 
@@ -1855,7 +2010,7 @@ function openBannerModal(bannerId) {
       document.getElementById('bSubtitle').value = b.subtitle || '';
       document.getElementById('bLink').value     = b.link     || '';
       document.getElementById('bOrder').value    = b.order    || '';
-      document.getElementById('bActive').checked = b.active !== false;
+     document.getElementById('bInterval').value = b.intervalMs ? b.intervalMs / 1000 : 4;
       document.getElementById('bannerImgUrl').value = b.imageUrl || '';
       if (b.imageUrl) {
         document.getElementById('bannerImgPreviewWrap').innerHTML =
@@ -1882,7 +2037,7 @@ function handleBannerImgSelect(event) {
 
 async function submitBanner() {
   const title = document.getElementById('bTitle').value.trim();
-  if (!title) { showToast('Banner title is required', 'error'); return; }
+ 
 
   const btn = document.getElementById('bannerSaveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
@@ -1895,25 +2050,32 @@ async function submitBanner() {
       if (fileInput.files[0]) {
         const fd = new FormData();
         fd.append('image', fileInput.files[0]);
-        const upRes = await fetch(`${API}/api/upload`, { method:'POST', headers:adminHeaders(), body:fd });
-        if (upRes.ok) {
-          const ud = await upRes.json();
-          imageUrl = ud.imageUrl || ud.url || '';
+      const upRes = await fetch(`${API}/api/upload?folder=banners`, { method:'POST', headers:adminHeaders(), body:fd });
+        const ud = await upRes.json().catch(() => ({}));
+        if (!upRes.ok) {
+          showToast(`Image upload failed (${upRes.status}): ${ud.error || 'Unknown error'}`, 'error');
+          console.error('Upload failed:', upRes.status, ud);
+          btn.disabled = false;
+          btn.textContent = 'Save Banner';
+          return;
         }
+        imageUrl = ud.imageUrl || ud.url || '';
       }
     }
 
-    const body = {
+   const body = {
       title,
-      subtitle: document.getElementById('bSubtitle').value.trim(),
-      link:     document.getElementById('bLink').value.trim(),
-      order:    parseInt(document.getElementById('bOrder').value) || 1,
-      active:   document.getElementById('bActive').checked,
+      subtitle:   document.getElementById('bSubtitle').value.trim(),
+      link:       document.getElementById('bLink').value.trim(),
+      order:      parseInt(document.getElementById('bOrder').value) || 1,
+      active:     document.getElementById('bActive').checked,
+      intervalMs: (parseInt(document.getElementById('bInterval').value) || 4) * 1000,
       imageUrl
     };
 
+
     const url    = editingBannerId ? `${API}/api/banners/${editingBannerId}` : `${API}/api/banners`;
-    const method = editingBannerId ? 'PUT' : 'POST';
+    const method = editingBannerId ? 'PATCH' : 'POST';
 
     const res = await fetch(url, {
       method, headers:{'Content-Type':'application/json',...adminHeaders()}, body:JSON.stringify(body)
@@ -1946,7 +2108,7 @@ function deleteBanner(id, title) {
 ═══════════════════════════════════════════════════════════════════ */
 async function loadReviews() {
   try {
-    const res = await fetch(`${API}/api/reviews`, { headers: adminHeaders() });
+const res = await fetch(`${API}/api/reviews/admin/all`, { headers: adminHeaders() });
     allReviews = res.ok ? await res.json() : [];
     renderReviews(allReviews);
   } catch {
@@ -1972,13 +2134,13 @@ function renderReviews(reviews) {
         </div>
         <div style="display:flex;align-items:center;gap:0.5rem;">
           <div class="review-stars">${'★'.repeat(r.rating||5)}${'☆'.repeat(5-(r.rating||5))}</div>
-          ${!r.visible ? '<span class="badge badge-blocked" style="font-size:0.65rem;">Hidden</span>' : ''}
+     ${!r.approved ? '<span class="badge badge-blocked" style="font-size:0.65rem;">Hidden</span>' : ''}
         </div>
       </div>
       <div class="review-text">${esc(r.text||'')}</div>
       <div class="review-actions">
-        <button class="btn btn-outline btn-sm" onclick="toggleReviewVisibility('${r.id}',${!r.visible})">
-          ${r.visible ? '🙈 Hide' : '👁️ Show'}
+        <button class="btn btn-outline btn-sm" onclick="toggleReviewVisibility('${r.id}',${!r.approved})">
+          ${r.approved ? '🙈 Hide' : '👁️ Show'}
         </button>
         <button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')">🗑️ Delete</button>
       </div>
@@ -1990,21 +2152,24 @@ function filterReviews() {
   const visible = document.getElementById('reviewVisibleFilter').value;
   const filtered = allReviews.filter(r => {
     const mR = !rating  || String(r.rating||5) === rating;
-    const mV = visible === '' || String(r.visible !== false) === visible;
+const mV = visible === '' || String(!!r.approved) === visible;
     return mR && mV;
   });
   renderReviews(filtered);
 }
 
 async function toggleReviewVisibility(id, newVisible) {
+  if (!newVisible) {
+    showToast('Hiding a review needs a backend update first — abhi sirf Approve kaam karega', 'error');
+    return;
+  }
   try {
-    const res = await fetch(`${API}/api/reviews/${id}`, {
+    const res = await fetch(`${API}/api/reviews/${id}/approve`, {
       method: 'PATCH',
-      headers: { 'Content-Type':'application/json', ...adminHeaders() },
-      body: JSON.stringify({ visible: newVisible })
+      headers: { 'Content-Type':'application/json', ...adminHeaders() }
     });
     if (!res.ok) throw new Error();
-    showToast(newVisible ? 'Review shown ✅' : 'Review hidden', 'success');
+    showToast('Review approved ✅', 'success');
     loadReviews();
   } catch { showToast('Update failed', 'error'); }
 }
@@ -2272,7 +2437,8 @@ function showToast(msg, type = '') {
    UTILS
 ───────────────────────────────────────────────────────────────── */
 function adminHeaders() {
-  return { 'x-user-id': adminUser?.uid || '', 'x-admin': 'true' };
+  const token = localStorage.getItem('centraa_admin_token') || '';
+  return { 'Authorization': `Bearer ${token}` };
 }
 function safeGet(key) {
   try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }

@@ -246,6 +246,52 @@ html, body { min-height: 100%; }
   }
   .forgot-row-inputs button:hover:not(:disabled) { background: var(--gold-light); }
   .forgot-row-inputs button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .reset-info {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .reset-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    flex: 1 1 220px;
+  }
+  .reset-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-link {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-link:hover:not(:disabled) {
+    color: var(--gold-light);
+    text-decoration: underline;
+  }
+  .btn-link:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+  #resendTimerText {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
   .forgot-msg {
     font-size: 12px;
     margin-top: 10px;
@@ -438,16 +484,24 @@ html, body { min-height: 100%; }
     </div>
   </div>
 
-  <!-- STEP 3: CODE + NEW PASSWORD -->
+  <!-- STEP 3: CODE CONFIRMATION + NEW PASSWORD -->
   <div id="step-reset" style="display:none;">
     <div class="login-heading">
       <h1>Set New Password</h1>
-      <p>Enter the code sent to your email</p>
+      <p>First confirm the code sent to your email.</p>
     </div>
 
     <div class="global-error" id="resetGlobalError"></div>
 
-    <form id="resetForm" novalidate>
+    <div class="reset-info" id="resetInfo">
+      <p id="resetInfoText">We sent a 6-digit code to your email. Enter it below to continue.</p>
+      <div class="reset-meta">
+        <button type="button" class="btn-link" id="resendCodeBtn" disabled>Resend code</button>
+        <span id="resendTimerText">Resend available in 60s</span>
+      </div>
+    </div>
+
+    <form id="verifyCodeForm" novalidate>
       <div class="form-group">
         <label for="resetCode">Verification Code</label>
         <div class="input-wrap">
@@ -456,6 +510,13 @@ html, body { min-height: 100%; }
         <div class="field-error" id="resetCodeError"></div>
       </div>
 
+      <button type="submit" class="btn-signin" id="verifyCodeBtn">
+        <span class="btn-label">Verify Code</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+
+    <form id="newPasswordForm" novalidate style="display:none; margin-top:20px;">
       <div class="form-group">
         <label for="newPassword">New Password</label>
         <div class="input-wrap has-toggle">
@@ -577,6 +638,67 @@ html, body { min-height: 100%; }
 
   // ============ STEP 2 → SEND CODE ============
   let resetEmailValue = '';
+  let resendTimer = null;
+  let resendSeconds = 60;
+
+  const resetInfoText = document.getElementById('resetInfoText');
+  const resendCodeBtn = document.getElementById('resendCodeBtn');
+  const resendTimerText = document.getElementById('resendTimerText');
+  const verifyCodeForm = document.getElementById('verifyCodeForm');
+  const newPasswordForm = document.getElementById('newPasswordForm');
+  const resetCodeInput = document.getElementById('resetCode');
+  const newPasswordInput = document.getElementById('newPassword');
+  const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
+
+  function startResendTimer() {
+    resendSeconds = 60;
+    resendCodeBtn.disabled = true;
+    resendTimerText.textContent = `Resend available in ${resendSeconds}s`;
+
+    if (resendTimer) {
+      clearInterval(resendTimer);
+    }
+
+    resendTimer = setInterval(() => {
+      resendSeconds -= 1;
+      if (resendSeconds <= 0) {
+        clearInterval(resendTimer);
+        resendCodeBtn.disabled = false;
+        resendTimerText.textContent = 'You can resend the code now.';
+        return;
+      }
+      resendTimerText.textContent = `Resend available in ${resendSeconds}s`;
+    }, 1000);
+  }
+
+  function showResetCodeStage() {
+    verifyCodeForm.style.display = 'block';
+    newPasswordForm.style.display = 'none';
+    resendCodeBtn.style.display = 'inline-block';
+    resendTimerText.style.display = 'inline';
+    resetInfoText.textContent = `A code has been sent to ${resetEmailValue}. Enter it below to continue.`;
+    resetCodeInput.value = '';
+    newPasswordInput.value = '';
+    confirmNewPasswordInput.value = '';
+    document.getElementById('resetCodeError').style.display = 'none';
+  }
+
+  function showNewPasswordStage() {
+    verifyCodeForm.style.display = 'none';
+    newPasswordForm.style.display = 'block';
+    resendCodeBtn.style.display = 'none';
+    resendTimerText.style.display = 'none';
+    resetInfoText.textContent = 'Code verified. Now set a new password for your account.';
+  }
+
+  async function requestResetCode(email) {
+    const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    return response;
+  }
 
   document.getElementById('forgotForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -599,12 +721,7 @@ html, body { min-height: 100%; }
     sendCodeBtn.classList.add('is-loading');
 
     try {
-      const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
+      const res = await requestResetCode(email);
       const data = await res.json().catch(() => ({}));
 
       if (res.status === 404) {
@@ -613,14 +730,15 @@ html, body { min-height: 100%; }
         return;
       }
       if (!res.ok) {
-        forgotGlobalError.textContent = data.error || 'Something went wrong. Please try again.';
+        forgotGlobalError.textContent = data.error || 'Unable to send reset email. Please try again.';
         forgotGlobalError.style.display = 'block';
         return;
       }
 
       resetEmailValue = email;
       showStep('reset');
-
+      showResetCodeStage();
+      startResendTimer();
     } catch (err) {
       forgotGlobalError.textContent = 'Network error. Please check your connection.';
       forgotGlobalError.style.display = 'block';
@@ -630,28 +748,87 @@ html, body { min-height: 100%; }
     }
   });
 
-  // ============ STEP 3 → RESET PASSWORD ============
-  document.getElementById('resetForm').addEventListener('submit', async (e) => {
+  resendCodeBtn.addEventListener('click', async () => {
+    if (!resetEmailValue) return;
+
+    resendCodeBtn.disabled = true;
+    resendTimerText.textContent = 'Resending code...';
+
+    try {
+      const res = await requestResetCode(resetEmailValue);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        document.getElementById('resetGlobalError').textContent = data.error || 'Unable to resend code. Please try again.';
+        document.getElementById('resetGlobalError').style.display = 'block';
+        return;
+      }
+      showResetCodeStage();
+      startResendTimer();
+    } catch (err) {
+      document.getElementById('resetGlobalError').textContent = 'Network error. Please check your connection.';
+      document.getElementById('resetGlobalError').style.display = 'block';
+    }
+  });
+
+  verifyCodeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const code = document.getElementById('resetCode').value.trim();
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
+    const code = resetCodeInput.value.trim();
     const resetCodeError = document.getElementById('resetCodeError');
+    const resetGlobalError = document.getElementById('resetGlobalError');
+    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+
+    resetCodeError.style.display = 'none';
+    resetGlobalError.style.display = 'none';
+
+    if (!/^[0-9]{6}$/.test(code)) {
+      resetCodeError.textContent = 'Enter the 6-digit code';
+      resetCodeError.style.display = 'block';
+      return;
+    }
+
+    verifyCodeBtn.disabled = true;
+    verifyCodeBtn.classList.add('is-loading');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/verify-reset-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmailValue, code }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        resetGlobalError.textContent = data.error || 'Invalid or expired code.';
+        resetGlobalError.style.display = 'block';
+        return;
+      }
+
+      showNewPasswordStage();
+    } catch (err) {
+      resetGlobalError.textContent = 'Network error. Please check your connection.';
+      resetGlobalError.style.display = 'block';
+    } finally {
+      verifyCodeBtn.disabled = false;
+      verifyCodeBtn.classList.remove('is-loading');
+    }
+  });
+
+  newPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const code = resetCodeInput.value.trim();
+    const newPassword = newPasswordInput.value;
+    const confirmNewPassword = confirmNewPasswordInput.value;
+
     const newPasswordError = document.getElementById('newPasswordError');
     const confirmNewPasswordError = document.getElementById('confirmNewPasswordError');
     const resetGlobalError = document.getElementById('resetGlobalError');
     const resetPasswordBtn = document.getElementById('resetPasswordBtn');
 
-    [resetCodeError, newPasswordError, confirmNewPasswordError, resetGlobalError].forEach(el => el.style.display = 'none');
+    [newPasswordError, confirmNewPasswordError, resetGlobalError].forEach(el => el.style.display = 'none');
 
     let valid = true;
-    if (!/^[0-9]{6}$/.test(code)) {
-      resetCodeError.textContent = 'Enter the 6-digit code';
-      resetCodeError.style.display = 'block';
-      valid = false;
-    }
     if (!newPassword || newPassword.length < 6) {
       newPasswordError.textContent = 'Password must be at least 6 characters';
       newPasswordError.style.display = 'block';
@@ -675,16 +852,14 @@ html, body { min-height: 100%; }
       });
 
       const data = await res.json().catch(() => ({}));
-
       if (!res.ok) {
-        resetGlobalError.textContent = data.error || 'Invalid or expired code.';
+        resetGlobalError.textContent = data.error || 'Unable to reset password. Please try again.';
         resetGlobalError.style.display = 'block';
         return;
       }
 
       showStep('login');
       showGlobalError('Password reset successfully. Please sign in with your new password.');
-
     } catch (err) {
       resetGlobalError.textContent = 'Network error. Please check your connection.';
       resetGlobalError.style.display = 'block';
@@ -693,6 +868,7 @@ html, body { min-height: 100%; }
       resetPasswordBtn.classList.remove('is-loading');
     }
   });
+
   // ============ LOGIN ============
   function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
