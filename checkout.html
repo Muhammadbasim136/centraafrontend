@@ -1523,7 +1523,6 @@
       const res = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',
         headers: authHeaders(),
-        credentials: 'include',
         body: JSON.stringify(payload)
       });
 
