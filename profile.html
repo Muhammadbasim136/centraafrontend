@@ -645,10 +645,7 @@
   const API_BASE = 'https://centraa-backend.vercel.app';
   const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
   const setUser = (u) => localStorage.setItem('centraa_user', JSON.stringify(u));
-  const authHeaders = () => {
-    const u = getUser();
-    return u ? { 'Authorization': `Bearer ${u.uid}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-  };
+  const authHeaders = () => ({ 'Content-Type': 'application/json' });
   const updateCartBadge = () => {
     const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
     document.querySelectorAll('.cart-badge').forEach(el => {
@@ -675,10 +672,16 @@
   });
 
   // ============ LOGOUT ============
-  function logout() {
-    localStorage.removeItem('centraa_user');
-    window.location.href = 'index.html';
-  }
+async function logout() {
+  try {
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (e) {}
+  localStorage.removeItem('centraa_user');
+  window.location.href = 'index.html';
+}
   document.getElementById('sidebarLogout').addEventListener('click', (e) => { e.preventDefault(); logout(); });
   document.getElementById('mobileLogout').addEventListener('click', (e) => { e.preventDefault(); logout(); });
 
@@ -825,6 +828,7 @@
       const res = await fetch(`${API_BASE}/api/users/me`, {
         method: 'PATCH',
         headers: authHeaders(),
+        credentials: 'include',
         body: JSON.stringify({ name, phone })
       });
 
@@ -874,7 +878,10 @@
     const statSpent = document.getElementById('statSpent');
 
     try {
-      const res = await fetch(`${API_BASE}/api/orders/mine`, { headers: authHeaders() });
+      const res = await fetch(`${API_BASE}/api/orders/mine`, { 
+        headers: authHeaders() ,
+        credentials: 'include'
+      });
       if (!res.ok) throw new Error('Failed to load orders');
       const orders = await res.json();
 
