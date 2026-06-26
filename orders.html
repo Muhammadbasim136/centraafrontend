@@ -622,10 +622,7 @@
   // ============ GLOBAL HELPERS ============
   const API_BASE = 'https://centraa-backend.vercel.app';
   const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
-  const authHeaders = () => {
-    const u = getUser();
-    return u ? { 'Authorization': `Bearer ${u.uid}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-  };
+  const authHeaders = () => ({ 'Content-Type': 'application/json' });
   const updateCartBadge = () => {
     const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
     document.querySelectorAll('.cart-badge').forEach(el => {
@@ -637,7 +634,8 @@
 
   // ============ AUTH GUARD ============
   const user = getUser();
-  if (!user) {
+const token = localStorage.getItem('centraa_token');
+if (!user || !token) {
     window.location.href = 'login.html?redirect=orders.html';
   }
 
@@ -704,7 +702,10 @@
   async function loadOrders() {
     const orderList = document.getElementById('orderList');
     try {
-      const res = await fetch(`${API_BASE}/api/orders/mine`, { headers: authHeaders() });
+ const res = await fetch(`${API_BASE}/api/orders/mine`, { 
+  headers: authHeaders(),
+  credentials: 'include'
+});
       if (!res.ok) throw new Error('Failed to load orders');
       allOrders = await res.json();
       renderOrders();
@@ -827,11 +828,11 @@
     modalConfirmBtn.textContent = 'Cancelling...';
 
     try {
-      const res = await fetch(`${API_BASE}/api/orders/${pendingCancelId}/cancel`, {
+const res = await fetch(`${API_BASE}/api/orders/${pendingCancelId}/cancel`, {
         method: 'PATCH',
-        headers: authHeaders()
-      });
-      const data = await res.json();
+        headers: authHeaders(),
+        credentials: 'include'
+      });      const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Could not cancel this order');
 
       const order = allOrders.find(o => o._id === pendingCancelId);

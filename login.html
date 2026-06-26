@@ -957,7 +957,6 @@ if (!res.ok) {
         return;
       }
 
-      localStorage.setItem('centraa_token', data.token);
       localStorage.setItem('centraa_user', JSON.stringify(data.user));
 
       window.location.href = redirectTo;
