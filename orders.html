@@ -650,10 +650,17 @@ if (!user || !token) {
   });
 
   // ============ LOGOUT ============
-  function logout() {
-    localStorage.removeItem('centraa_user');
-    window.location.href = 'index.html';
-  }
+async function logout() {
+  try {
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include' // cookie clear karega
+    });
+  } catch (e) {}
+  localStorage.removeItem('centraa_user');
+  localStorage.removeItem('centraa_token');
+  window.location.href = 'index.html';
+}
   document.getElementById('sidebarLogout').addEventListener('click', (e) => { e.preventDefault(); logout(); });
   document.getElementById('mobileLogout').addEventListener('click', (e) => { e.preventDefault(); logout(); });
 
