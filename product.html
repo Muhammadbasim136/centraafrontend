@@ -1020,9 +1020,11 @@
   const API_BASE = 'https://centraa-backend.vercel.app';
   const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
   const authHeaders = () => {
-    const u = getUser();
-    return u ? { 'Authorization': `Bearer ${u.uid}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-  };
+  const token = localStorage.getItem('centraa_token') || '';
+  return token
+    ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+    : { 'Content-Type': 'application/json' };
+};
   const getCart = () => JSON.parse(localStorage.getItem('centraa_cart') || '[]');
   const saveCart = (cart) => { localStorage.setItem('centraa_cart', JSON.stringify(cart)); updateCartBadge(); };
   const addToCart = (product, qty = 1) => {
@@ -1343,7 +1345,7 @@
 
       setTimeout(() => {
         addToCart({
-          id: getProductId(currentProduct),
+          id: getProductId(currentProduct) || productId,
           name: currentProduct.name,
           price: currentProduct.price,
           image: currentProduct.imageUrl
