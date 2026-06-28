@@ -622,7 +622,12 @@
   // ============ GLOBAL HELPERS ============
   const API_BASE = 'https://centraa-backend.vercel.app';
   const getUser = () => JSON.parse(localStorage.getItem('centraa_user') || 'null');
-  const authHeaders = () => ({ 'Content-Type': 'application/json' });
+  const authHeaders = () => {
+  const token = localStorage.getItem('centraa_token') || '';
+  return token
+    ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+    : { 'Content-Type': 'application/json' };
+};
   const updateCartBadge = () => {
     const total = JSON.parse(localStorage.getItem('centraa_cart') || '[]').reduce((s,i) => s + i.qty, 0);
     document.querySelectorAll('.cart-badge').forEach(el => {
@@ -634,10 +639,9 @@
 
   // ============ AUTH GUARD ============
   const user = getUser();
-const token = localStorage.getItem('centraa_token');
-if (!user || !token) {
-    window.location.href = 'login.html?redirect=orders.html';
-  }
+if (!user) {
+  window.location.href = 'login.html?redirect=orders.html';
+}
 
   // ============ MOBILE NAV TOGGLE ============
   const navToggle = document.querySelector('.nav-toggle');
