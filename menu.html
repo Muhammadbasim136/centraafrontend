@@ -1717,7 +1717,7 @@ const buildProductCard = (p) => {
   if (!oos) {
     const addBtn = card.querySelector('.btn-add-cart');
     addBtn.addEventListener('click', () => {
-      addToCart({ id: p._id, name: p.name, price: p.price, image: p.imageUrl || '' }, qty);
+     addToCart({ id: p._id || p.id, name: p.name, price: p.price, image: p.imageUrl || '' }, qty);
       addBtn.textContent = 'Added ✓';
       addBtn.classList.add('added');
       addBtn.disabled = true;
@@ -1982,7 +1982,7 @@ const openQuickView = (p) => {
   if (!oos) {
     const addBtn = qvBody.querySelector('#qv-add-btn');
     addBtn.addEventListener('click', () => {
-      addToCart({ id: p._id, name: p.name, price: p.price, image: p.imageUrl || '' }, qvQty);
+     addToCart({ id: p._id || p.id, name: p.name, price: p.price, image: p.imageUrl || '' }, qvQty);
       addBtn.textContent = 'Added ✓';
       addBtn.classList.add('added');
       addBtn.disabled = true;
