@@ -1299,6 +1299,7 @@ const res = await apiFetch(`${API}/api/admin/login`, {
     }
 
     adminUser = data.user;
+    localStorage.setItem('centraa_admin_token', data.token); 
     localStorage.setItem('centraa_admin', JSON.stringify(data.user));
     localStorage.setItem('centraa_user', JSON.stringify(data.user));
     showApp();
@@ -2440,8 +2441,10 @@ function showToast(msg, type = '') {
    UTILS
 ───────────────────────────────────────────────────────────────── */
 function adminHeaders() {
-  return {};
+  const token = localStorage.getItem('centraa_admin_token') || '';
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
+
 function safeGet(key) {
   try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
 }

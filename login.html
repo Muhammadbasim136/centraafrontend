@@ -845,15 +845,11 @@ html, body { min-height: 100%; }
     resetPasswordBtn.classList.add('is-loading');
 
     try {
-      const token = localStorage.getItem('centraa_token');
-if (!user || !token) {
-  window.location.href = 'login.html?redirect=orders.html';
-}
-
-if (!user) {
-  window.location.href = 'login.html?redirect=orders.html';
-}
-
+const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: resetEmailValue, code, newPassword })
+});
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -963,6 +959,7 @@ if (!res.ok) {
       }
 
       localStorage.setItem('centraa_user', JSON.stringify(data.user));
+      localStorage.setItem('centraa_token', data.token);
 
       window.location.href = redirectTo;
 
