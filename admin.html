@@ -1207,7 +1207,11 @@ window.deleteProduct = deleteProduct;
 /* ─────────────────────────────────────────────────────────────────
    CONFIG
 ───────────────────────────────────────────────────────────────── */
-const API = 'https://centraa-backend.vercel.app'; // ← your backend URL
+const API = 'https://centraa-backend.vercel.app'; 
+
+async function apiFetch(url, options = {}) {
+  return fetch(url, { ...options, credentials: 'include' });
+}
 
 /* ─────────────────────────────────────────────────────────────────
    STATE
@@ -1281,7 +1285,7 @@ async function handleAdminLogin() {
   btn.textContent = 'Signing in…';
 
   try {
-const res = await fetch(`${API}/api/admin/login`, {
+const res = await apiFetch(`${API}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password: pass })
@@ -1295,9 +1299,7 @@ const res = await fetch(`${API}/api/admin/login`, {
     }
 
     adminUser = data.user;
-    localStorage.setItem('centraa_admin_token', data.token);
     localStorage.setItem('centraa_admin', JSON.stringify(data.user));
-    // Also set centraa_user so site pages work
     localStorage.setItem('centraa_user', JSON.stringify(data.user));
     showApp();
 
@@ -1393,9 +1395,9 @@ function toggleSidebar() {
 async function loadDashboard() {
   try {
    const [ordersRes, usersRes, productsRes] = await Promise.all([
-      fetch(`${API}/api/orders/admin/all`, { headers: adminHeaders() }),
-      fetch(`${API}/api/users/admin/all`,  { headers: adminHeaders() }),
-      fetch(`${API}/api/products`)
+      apiFetch(`${API}/api/orders/admin/all`, { headers: adminHeaders() }),
+      apiFetch(`${API}/api/users/admin/all`,  { headers: adminHeaders() }),
+      apiFetch(`${API}/api/products`)
     ]);
 
     const orders   = ordersRes.ok   ? await ordersRes.json()   : [];
@@ -1452,7 +1454,7 @@ const recent = [...orders].sort((a,b) => new Date(b.createdAt||0) - new Date(a.c
 ═══════════════════════════════════════════════════════════════════ */
 async function loadOrders() {
   try {
-const res = await fetch(`${API}/api/orders/admin/all`, { headers: adminHeaders() });
+const res = await apiFetch(`${API}/api/orders/admin/all`, { headers: adminHeaders() });
     allOrders = res.ok ? await res.json() : [];
     renderOrders(allOrders);
   } catch (err) {
@@ -1507,7 +1509,7 @@ function openOrderStatus(orderId, currentStatus) {
 async function submitOrderStatus() {
   const newStatus = document.getElementById('osStatusSelect').value;
   try {
-    const res = await fetch(`${API}/api/orders/${currentOrderForStatus}/status`, {
+    const res = await apiFetch(`${API}/api/orders/${currentOrderForStatus}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type':'application/json', ...adminHeaders() },
       body: JSON.stringify({ status: newStatus })
@@ -1526,7 +1528,7 @@ async function submitOrderStatus() {
 ═══════════════════════════════════════════════════════════════════ */
 async function loadProducts() {
   try {
-    const res = await fetch(`${API}/api/products`);
+    const res = await apiFetch(`${API}/api/products`);
     allProducts = res.ok ? await res.json() : [];
     // Populate category filter
     const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
@@ -1678,7 +1680,7 @@ async function submitProduct() {
       if (fileInput.files[0]) {
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
-const uploadRes = await fetch(`${API}/api/upload`, {
+const uploadRes = await apiFetch(`${API}/api/upload`, {
           method: 'POST',
           headers: adminHeaders(),
           body: formData
@@ -1711,7 +1713,7 @@ if (uploadRes.ok) {
    const url    = editingProductId ? `${API}/api/products/${editingProductId}` : `${API}/api/products`;
     const method = editingProductId ? 'PATCH' : 'POST';
 
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
       method,
       headers: { 'Content-Type':'application/json', ...adminHeaders() },
       body: JSON.stringify(body)
@@ -1733,7 +1735,8 @@ if (uploadRes.ok) {
 
 async function toggleProductField(id, field, value) {
   try {
-    const res = await fetch(`${API}/api/products/${id}`, {
+    const res = await apiFetch(`${API}/api/products/${id}`, {
+      credentials: 'include',
       method: 'PATCH',
       headers: { 'Content-Type':'application/json', ...adminHeaders() },
       body: JSON.stringify({ [field]: value })
@@ -1751,7 +1754,7 @@ async function toggleProductField(id, field, value) {
 
 async function toggleProductStock(id, inStock) {
   try {
-    const res = await fetch(`${API}/api/products/${id}`, {
+    const res = await apiFetch(`${API}/api/products/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type':'application/json', ...adminHeaders() },
       body: JSON.stringify({ stock: inStock ? 999 : 0 })
@@ -1772,7 +1775,7 @@ function deleteProduct(id, btnEl) {
     '🗑️', `Delete "${name}"?`, 'This item will be removed from the menu permanently.',
     async () => {
       try {
-        const res = await fetch(`${API}/api/products/${id}`, {
+        const res = await apiFetch(`${API}/api/products/${id}`, {
           method: 'DELETE', headers: adminHeaders()
         });
         if (!res.ok) throw new Error();
@@ -1804,7 +1807,7 @@ window.toggleVoucherActive = toggleVoucherActive;
 ═══════════════════════════════════════════════════════════════════ */
 async function loadUsers() {
   try {
-    const res = await fetch(`${API}/api/users/admin/all`, { headers: adminHeaders() });
+    const res = await apiFetch(`${API}/api/users/admin/all`, { headers: adminHeaders() });
     allUsers = res.ok ? await res.json() : [];
     renderUsers(allUsers);
   } catch {
@@ -1861,7 +1864,7 @@ function toggleUserBlock(userId, newBlocked, name) {
     newBlocked ? 'This user will not be able to log in.' : 'This user will regain access.',
     async () => {
       try {
-        const res = await fetch(`${API}/api/users/admin/${userId}/block`, {
+        const res = await apiFetch(`${API}/api/users/admin/${userId}/block`, {
           method: 'PATCH',
           headers: { 'Content-Type':'application/json', ...adminHeaders() },
           body: JSON.stringify({ blocked: newBlocked })
@@ -1882,7 +1885,7 @@ function deleteUser(userId, name) {
     'This user will be removed permanently and will no longer be able to log in.',
     async () => {
       try {
-        const res = await fetch(`${API}/api/users/admin/${userId}`, {
+        const res = await apiFetch(`${API}/api/users/admin/${userId}`, {
           method: 'DELETE',
           headers: adminHeaders()
         });
@@ -1902,7 +1905,7 @@ function deleteUser(userId, name) {
 ═══════════════════════════════════════════════════════════════════════════ */
 async function loadBanners() {
   try {
-    const res = await fetch(`${API}/api/banners`, { headers: adminHeaders() });
+    const res = await apiFetch(`${API}/api/banners`, { headers: adminHeaders() });
     allBanners = res.ok ? await res.json() : [];
     renderBanners(allBanners);
     loadPromo();
@@ -1915,7 +1918,7 @@ async function loadBanners() {
 // ── PROMO STRIP ──────────────────────────────────────────────
 async function loadPromo() {
   try {
-    const res = await fetch(`${API}/api/banners/promo/admin`, { headers: adminHeaders() });
+    const res = await apiFetch(`${API}/api/banners/promo/admin`, { headers: adminHeaders() });
     const data = res.ok ? await res.json() : null;
     if (data) {
       document.getElementById('promoText').value = data.text || '';
@@ -1931,14 +1934,14 @@ async function savePromo() {
   btn.disabled = true;
   btn.textContent = 'Saving…';
   try {
-    const res = await fetch(`${API}/api/banners/promo`, {
+    const res = await apiFetch(`${API}/api/banners/promo`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...adminHeaders() },
       body: JSON.stringify({ text, active })
     });
     if (res.status === 404) {
       // No promo exists yet — create one
-      await fetch(`${API}/api/banners/promo`, {
+      await apiFetch(`${API}/api/banners/promo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...adminHeaders() },
         body: JSON.stringify({ text, active })
@@ -1955,7 +1958,7 @@ async function savePromo() {
 
 async function togglePromoActive(value) {
   try {
-    await fetch(`${API}/api/banners/promo`, {
+    await apiFetch(`${API}/api/banners/promo`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', ...adminHeaders() },
       body: JSON.stringify({ active: value })
@@ -2050,7 +2053,7 @@ async function submitBanner() {
       if (fileInput.files[0]) {
         const fd = new FormData();
         fd.append('image', fileInput.files[0]);
-      const upRes = await fetch(`${API}/api/upload?folder=banners`, { method:'POST', headers:adminHeaders(), body:fd });
+      const upRes = await apiFetch(`${API}/api/upload?folder=banners`, { method:'POST', headers:adminHeaders(), body:fd });
         const ud = await upRes.json().catch(() => ({}));
         if (!upRes.ok) {
           showToast(`Image upload failed (${upRes.status}): ${ud.error || 'Unknown error'}`, 'error');
@@ -2077,7 +2080,7 @@ async function submitBanner() {
     const url    = editingBannerId ? `${API}/api/banners/${editingBannerId}` : `${API}/api/banners`;
     const method = editingBannerId ? 'PATCH' : 'POST';
 
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
       method, headers:{'Content-Type':'application/json',...adminHeaders()}, body:JSON.stringify(body)
     });
     if (!res.ok) throw new Error();
@@ -2094,7 +2097,7 @@ async function submitBanner() {
 function deleteBanner(id, title) {
   openConfirm('🗑️', `Delete "${title}"?`, 'This banner will be removed from the homepage.', async () => {
     try {
-      const res = await fetch(`${API}/api/banners/${id}`, { method:'DELETE', headers:adminHeaders() });
+      const res = await apiFetch(`${API}/api/banners/${id}`, { method:'DELETE', headers:adminHeaders() });
       if (!res.ok) throw new Error();
       closeModal('confirmModal');
       showToast('Banner deleted', 'success');
@@ -2108,7 +2111,7 @@ function deleteBanner(id, title) {
 ═══════════════════════════════════════════════════════════════════ */
 async function loadReviews() {
   try {
-const res = await fetch(`${API}/api/reviews/admin/all`, { headers: adminHeaders() });
+const res = await apiFetch(`${API}/api/reviews/admin/all`, { headers: adminHeaders() });
     allReviews = res.ok ? await res.json() : [];
     renderReviews(allReviews);
   } catch {
@@ -2164,7 +2167,7 @@ async function toggleReviewVisibility(id, newVisible) {
     return;
   }
   try {
-    const res = await fetch(`${API}/api/reviews/${id}/approve`, {
+    const res = await apiFetch(`${API}/api/reviews/${id}/approve`, {
       method: 'PATCH',
       headers: { 'Content-Type':'application/json', ...adminHeaders() }
     });
@@ -2177,7 +2180,7 @@ async function toggleReviewVisibility(id, newVisible) {
 function deleteReview(id) {
   openConfirm('🗑️', 'Delete this review?', 'It will be permanently removed.', async () => {
     try {
-      const res = await fetch(`${API}/api/reviews/${id}`, { method:'DELETE', headers:adminHeaders() });
+      const res = await apiFetch(`${API}/api/reviews/${id}`, { method:'DELETE', headers:adminHeaders() });
       if (!res.ok) throw new Error();
       closeModal('confirmModal');
       showToast('Review deleted', 'success');
@@ -2191,7 +2194,7 @@ function deleteReview(id) {
 ═══════════════════════════════════════════════════════════════════ */
 async function loadVouchers() {
   try {
-    const res = await fetch(`${API}/api/vouchers`, { headers: adminHeaders() });
+    const res = await apiFetch(`${API}/api/vouchers`, { headers: adminHeaders() });
     allVouchers = res.ok ? await res.json() : [];
     renderVouchers(allVouchers);
   } catch {
@@ -2342,7 +2345,7 @@ async function submitVoucher() {
     const url    = editingVoucherId ? `${API}/api/vouchers/${editingVoucherId}` : `${API}/api/vouchers`;
     const method = editingVoucherId ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
+    const res = await apiFetch(url, {
       method,
       headers: { 'Content-Type':'application/json', ...adminHeaders() },
       body: JSON.stringify(body)
@@ -2367,7 +2370,7 @@ async function submitVoucher() {
 
 async function toggleVoucherActive(id, value) {
   try {
-    const res = await fetch(`${API}/api/vouchers/${id}`, {
+    const res = await apiFetch(`${API}/api/vouchers/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type':'application/json', ...adminHeaders() },
       body: JSON.stringify({ active: value })
@@ -2387,7 +2390,7 @@ function deleteVoucher(id, code) {
     '🗑️', `Delete "${code}"?`, 'This voucher will be permanently removed and can no longer be used.',
     async () => {
       try {
-        const res = await fetch(`${API}/api/vouchers/${id}`, {
+        const res = await apiFetch(`${API}/api/vouchers/${id}`, {
           method: 'DELETE', headers: adminHeaders()
         });
         if (!res.ok) throw new Error();
@@ -2437,8 +2440,7 @@ function showToast(msg, type = '') {
    UTILS
 ───────────────────────────────────────────────────────────────── */
 function adminHeaders() {
-  const token = localStorage.getItem('centraa_admin_token') || '';
-  return { 'Authorization': `Bearer ${token}` };
+  return {};
 }
 function safeGet(key) {
   try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
